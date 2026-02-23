@@ -1,0 +1,58 @@
+import type { Lesson } from '@/types/lesson';
+
+export const paragraphLessons: Lesson[] = [
+  {
+    id: 'pg-1',
+    title: 'The Art of Typing',
+    description: 'A short passage about touch typing.',
+    category: 'paragraphs',
+    difficulty: 'intermediate',
+    order: 1,
+    text: 'Touch typing is the ability to type without looking at the keyboard. This skill allows you to focus on the screen and your thoughts rather than hunting for each key. With regular practice, you can build muscle memory that makes typing feel as natural as speaking. Start slow, focus on accuracy, and speed will follow naturally.',
+  },
+  {
+    id: 'pg-2',
+    title: 'Morning Routine',
+    description: 'A paragraph about daily habits.',
+    category: 'paragraphs',
+    difficulty: 'intermediate',
+    order: 2,
+    text: 'Every morning begins with the gentle sound of an alarm clock. The first rays of sunlight peek through the curtains as you stretch and prepare for the day ahead. A warm cup of coffee fills the kitchen with its rich aroma. After a quick breakfast, you review your schedule and set your priorities for the hours to come.',
+  },
+  {
+    id: 'pg-3',
+    title: 'The Digital Age',
+    description: 'A passage about modern technology.',
+    category: 'paragraphs',
+    difficulty: 'advanced',
+    order: 3,
+    text: 'We live in an era of unprecedented technological advancement. Smartphones connect us to vast networks of information and people across the globe. Artificial intelligence is transforming industries from healthcare to transportation. Yet amid all this progress, the fundamental human need for connection and understanding remains unchanged. The tools may evolve, but the desire to communicate, learn, and grow stays constant.',
+  },
+  {
+    id: 'pg-4',
+    title: 'Seasons Change',
+    description: 'A descriptive passage about nature.',
+    category: 'paragraphs',
+    difficulty: 'intermediate',
+    order: 4,
+    text: 'Spring arrives with a burst of color as flowers bloom and trees sprout new leaves. Birds return from their winter journeys, filling the air with song. Summer brings long, warm days perfect for outdoor adventures. Autumn paints the landscape in shades of gold and crimson, while winter blankets the world in peaceful silence.',
+  },
+  {
+    id: 'pg-5',
+    title: 'The Power of Reading',
+    description: 'A longer passage about literature.',
+    category: 'paragraphs',
+    difficulty: 'advanced',
+    order: 5,
+    text: 'Reading opens doors to worlds beyond our imagination. Through books, we can travel through time, explore distant galaxies, and walk in the shoes of characters from every walk of life. A good book challenges our assumptions, broadens our perspective, and deepens our empathy. Whether fiction or nonfiction, each page turned is a step toward greater understanding of ourselves and the world around us.',
+  },
+  {
+    id: 'pg-6',
+    title: 'Learning to Code',
+    description: 'A passage about programming.',
+    category: 'paragraphs',
+    difficulty: 'advanced',
+    order: 6,
+    text: 'Programming is the art of giving precise instructions to a computer. Like learning any new language, it starts with basic vocabulary and grammar before moving to complex expressions. Every programmer begins with simple programs and gradually tackles more challenging problems. Debugging teaches patience and attention to detail. The satisfaction of seeing your code work correctly makes every frustrating moment worthwhile.',
+  },
+];

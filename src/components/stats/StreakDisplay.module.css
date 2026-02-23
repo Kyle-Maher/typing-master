@@ -1,0 +1,29 @@
+.streak {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-warning-light);
+  border-radius: var(--radius-full);
+  animation: pulse 2s ease infinite;
+}
+
+.flame {
+  font-size: var(--text-xl);
+}
+
+.count {
+  font-size: var(--text-lg);
+  font-weight: 800;
+  color: var(--color-warning);
+}
+
+.label {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
