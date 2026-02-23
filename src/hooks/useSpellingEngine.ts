@@ -22,10 +22,25 @@ export interface SpellingEngine {
   submitAnswer: () => void;
   nextWord: () => void;
   revealHint: () => void;
+  replayWord: () => void;
   reset: () => void;
 }
 
-const SHOW_DURATION = 2500;
+const SPEECH_FALLBACK_TIMEOUT = 5000;
+
+function speakWord(word: string, onEnd?: () => void): SpeechSynthesisUtterance | null {
+  if (typeof window === 'undefined' || !window.speechSynthesis) {
+    onEnd?.();
+    return null;
+  }
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(word);
+  utterance.rate = 0.8;
+  if (onEnd) utterance.onend = onEnd;
+  if (onEnd) utterance.onerror = onEnd;
+  window.speechSynthesis.speak(utterance);
+  return utterance;
+}
 
 export function useSpellingEngine(words: SpellingWord[]): SpellingEngine {
   const [state, setState] = useState<SpellingState>(() => ({
@@ -40,18 +55,25 @@ export function useSpellingEngine(words: SpellingWord[]): SpellingEngine {
     totalWords: words.length,
   }));
 
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const currentWord = words[state.currentIndex];
 
-  // Auto-hide word after showing
+  // Speak word and transition to typing phase
   useEffect(() => {
-    if (state.phase === 'showing') {
-      timerRef.current = setTimeout(() => {
-        setState((prev) => ({ ...prev, phase: 'typing' }));
-      }, SHOW_DURATION);
-      return () => clearTimeout(timerRef.current);
+    if (state.phase === 'showing' && currentWord) {
+      const transitionToTyping = () => {
+        clearTimeout(timerRef.current);
+        setState((prev) => (prev.phase === 'showing' ? { ...prev, phase: 'typing' } : prev));
+      };
+      speakWord(currentWord.word, transitionToTyping);
+      // Fallback in case speech doesn't fire onend
+      timerRef.current = setTimeout(transitionToTyping, SPEECH_FALLBACK_TIMEOUT);
+      return () => {
+        clearTimeout(timerRef.current);
+        window.speechSynthesis?.cancel();
+      };
     }
-  }, [state.phase, state.currentIndex]);
+  }, [state.phase, state.currentIndex, currentWord]);
 
   const setInput = useCallback((value: string) => {
     setState((prev) => ({ ...prev, input: value }));
@@ -101,6 +123,10 @@ export function useSpellingEngine(words: SpellingWord[]): SpellingEngine {
     });
   }, []);
 
+  const replayWord = useCallback(() => {
+    if (currentWord) speakWord(currentWord.word);
+  }, [currentWord]);
+
   const revealHint = useCallback(() => {
     setState((prev) => ({ ...prev, showHint: true }));
   }, []);
@@ -119,5 +145,5 @@ export function useSpellingEngine(words: SpellingWord[]): SpellingEngine {
     });
   }, [words.length]);
 
-  return { state, currentWord, setInput, submitAnswer, nextWord, revealHint, reset };
+  return { state, currentWord, setInput, submitAnswer, nextWord, revealHint, replayWord, reset };
 }

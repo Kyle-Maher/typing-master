@@ -57,6 +57,7 @@ function SpellingSession({ lesson, onBack }: { lesson: NonNullable<ReturnType<ty
           phase={engine.state.phase}
           showHint={engine.state.showHint}
           onRevealHint={engine.revealHint}
+          onReplay={engine.replayWord}
         />
       )}
       <SpellingArea engine={engine} />

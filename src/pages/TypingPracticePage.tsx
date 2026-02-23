@@ -1,3 +1,4 @@
+import { useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTypingEngine } from '@/hooks/useTypingEngine';
 import { useKeyboardInput } from '@/hooks/useKeyboardInput';
@@ -26,7 +27,7 @@ export function TypingPracticePage() {
 
   const targetChar = engine.text[engine.state.cursor];
 
-  const handleFinish = () => {
+  const handleFinish = useCallback(() => {
     if (!profile || !engine.state.isComplete) return;
     const result: LessonResult = {
       id: crypto.randomUUID(),
@@ -50,7 +51,16 @@ export function TypingPracticePage() {
     };
     addLessonResult(result);
     navigate(`/results/${result.lessonId}`);
-  };
+  }, [profile, engine, lessonId, lesson, progress, addLessonResult, navigate]);
+
+  useEffect(() => {
+    if (!engine.state.isComplete) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') handleFinish();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [engine.state.isComplete, handleFinish]);
 
   return (
     <div className={styles.page}>

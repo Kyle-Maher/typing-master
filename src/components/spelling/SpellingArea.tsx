@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import clsx from 'clsx';
 import type { SpellingEngine } from '@/hooks/useSpellingEngine';
 import { ProgressBar } from '@/components/common/ProgressBar';
@@ -11,6 +12,15 @@ interface SpellingAreaProps {
 export function SpellingArea({ engine }: SpellingAreaProps) {
   const { state, submitAnswer, nextWord, setInput } = engine;
   const progress = ((state.currentIndex + (state.phase === 'done' ? 0 : 0)) / state.totalWords) * 100;
+
+  useEffect(() => {
+    if (state.phase !== 'result') return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') nextWord();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [state.phase, nextWord]);
 
   if (state.phase === 'done') {
     return (
@@ -71,7 +81,7 @@ export function SpellingArea({ engine }: SpellingAreaProps) {
       )}
 
       {state.phase === 'showing' && (
-        <p className={styles.showingText}>Memorize this word...</p>
+        <p className={styles.showingText}>Listen carefully...</p>
       )}
     </div>
   );

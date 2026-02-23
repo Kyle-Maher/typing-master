@@ -69,7 +69,7 @@ export function TypingArea({ engine }: TypingAreaProps) {
       </div>
       {state.isComplete && (
         <div className={styles.complete} aria-live="assertive">
-          Complete! Press any key or click Retry to start again.
+          Complete! Press Enter to view results, or click Retry.
         </div>
       )}
     </div>

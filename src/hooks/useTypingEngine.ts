@@ -31,7 +31,6 @@ const IGNORED_KEYS = new Set(['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Ta
 export function useTypingEngine(initialText: string): TypingEngine {
   const [text, setText] = useState(initialText);
   const timer = useTimer();
-  const totalTypedRef = useRef(0);
 
   const [state, setState] = useState<TypingState>(() => ({
     cursor: 0,
@@ -56,7 +55,7 @@ export function useTypingEngine(initialText: string): TypingEngine {
   );
 
   const correctCount = state.correct.filter(Boolean).length;
-  const accuracy = calculateAccuracy(correctCount, totalTypedRef.current);
+  const accuracy = calculateAccuracy(correctCount, state.correct.length);
 
   // Use an effect to start/stop the timer based on state changes,
   // rather than calling timer methods inside setState.
@@ -105,7 +104,6 @@ export function useTypingEngine(initialText: string): TypingEngine {
           const newCursor = prev.cursor + 1;
           const newTyped = [...prev.typed, key];
           const newCorrect = [...prev.correct, isCorrect];
-          totalTypedRef.current += 1;
 
           let newErrors = prev.errors;
           let newProblemKeys = prev.problemKeys;
@@ -147,7 +145,6 @@ export function useTypingEngine(initialText: string): TypingEngine {
     (newText?: string) => {
       if (newText !== undefined) setText(newText);
       timer.reset();
-      totalTypedRef.current = 0;
       needsTimerStart.current = false;
       needsTimerStop.current = false;
       setState({
