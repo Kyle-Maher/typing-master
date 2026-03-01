@@ -1,3 +1,4 @@
+import React from 'react';
 import clsx from 'clsx';
 import styles from './CharacterDisplay.module.css';
 
@@ -8,10 +9,10 @@ interface CharacterDisplayProps {
   state: CharState;
 }
 
-export function CharacterDisplay({ char, state }: CharacterDisplayProps) {
+export const CharacterDisplay = React.memo(function CharacterDisplay({ char, state }: CharacterDisplayProps) {
   return (
     <span className={clsx(styles.char, styles[state])} aria-hidden="true">
       {char === ' ' ? '\u00A0' : char}
     </span>
   );
-}
+});
