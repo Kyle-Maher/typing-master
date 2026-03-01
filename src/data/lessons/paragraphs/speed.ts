@@ -1,6 +1,6 @@
 import type { Lesson } from '@/types/lesson';
 
-export const paragraphLessons: Lesson[] = [
+export default [
   {
     id: 'pg-1',
     title: 'Flow State',
@@ -73,4 +73,4 @@ export const paragraphLessons: Lesson[] = [
     order: 8,
     text: 'The difference between a typist who types at sixty words per minute and one who types at ninety is not raw intelligence or physical advantage. It is the number of hours spent in focused repetition on passages just difficult enough to be challenging. Comfort is the enemy of improvement. The moment a passage feels easy, it is time to find a harder one and begin the whole process again.',
   },
-];
+] satisfies Lesson[];

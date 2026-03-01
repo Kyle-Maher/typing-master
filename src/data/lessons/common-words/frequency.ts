@@ -1,6 +1,6 @@
 import type { Lesson } from '@/types/lesson';
 
-export const commonWordsLessons: Lesson[] = [
+export default [
   {
     id: 'cw-1',
     title: 'Top 25: The Absolute Core',
@@ -73,4 +73,4 @@ export const commonWordsLessons: Lesson[] = [
     order: 8,
     text: 'the to of and a in it that was is on for are with as at be this have not from but what all were when by we there one had can who said time if will each about up out them than her many some their would other into has more two like him see could no make my any these give day most us over think also back after use first well way even new want',
   },
-];
+] satisfies Lesson[];

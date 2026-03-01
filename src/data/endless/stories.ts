@@ -1,0 +1,17 @@
+export const STORY_SENTENCES = [
+  'The old lighthouse stood at the edge of the rocky coast, its beam sweeping the dark water.',
+  'She found the letter tucked inside a worn book on the highest shelf of the attic.',
+  'Rain fell steadily as the traveler knocked on the door of the only lit house on the lane.',
+  'He carried the photograph everywhere, a reminder of the morning everything changed.',
+  'The library closed at dusk but she stayed, certain there was one more answer hidden in the stacks.',
+  'Two strangers sat on opposite ends of the bench and said nothing, yet both felt less alone.',
+  'The map was torn down the middle, and each sibling carried half across different oceans.',
+  'Every summer the family returned to the same lake, though the dock had grown smaller each year.',
+  'She wrote his name in the sand before the tide erased it, just as she had done every year since.',
+  'The dog waited at the door long after the footsteps had faded into silence.',
+  'In the margin of the old journal, someone had drawn a small arrow pointing to nothing.',
+  'The shop bell rang as the last customer left, and the owner turned the sign to Closed for the final time.',
+  'He learned to read by tracing the letters carved into the wooden table in the back room.',
+  'The train slowed but never stopped at that particular station, no matter what time of day.',
+  'She pressed the flower between the pages of the dictionary, between the words for loss and luck.',
+];

@@ -1,6 +1,6 @@
 import type { Lesson } from '@/types/lesson';
 
-export const sentenceLessons: Lesson[] = [
+export default [
   {
     id: 'sn-1',
     title: 'Double Letters',
@@ -73,4 +73,4 @@ export const sentenceLessons: Lesson[] = [
     order: 8,
     text: "It's difficult to successfully address the committee's concerns without first understanding what they've struggled with. She couldn't stress the point strongly enough: accurate, deliberate practice -- not speed -- is what builds lasting skill.",
   },
-];
+] satisfies Lesson[];

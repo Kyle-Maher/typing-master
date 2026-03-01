@@ -1,0 +1,18 @@
+export const POEM_LINES = [
+  'The wind forgets the names of leaves it scattered in the fall.',
+  'A candle asks for nothing, only room to burn and glow.',
+  'She counted stars until the counting felt like prayer.',
+  'Each morning the sea rewrites the shore in salt and foam.',
+  'He kept his silence like a stone worn smooth by years of water.',
+  'The clock on the wall measures hours but not the weight of them.',
+  'Light comes through the cracks in things that once were whole.',
+  'Words left unsaid arrange themselves into the shape of rooms.',
+  'A bird lands once and then the branch remembers it forever.',
+  'The moon keeps its own schedule, indifferent to our clocks.',
+  'Some days arrive like an old song you forgot you knew.',
+  'The forest holds its breath just before the first snow falls.',
+  'She folded her grief into the corners of an ordinary Tuesday.',
+  'Two clouds meet above the ridge and pass without recognition.',
+  'Rain on a window is the sound of elsewhere calling home.',
+  'Every ending hides a door that only looks like a wall.',
+];

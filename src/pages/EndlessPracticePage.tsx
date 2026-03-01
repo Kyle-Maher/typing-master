@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTypingEngine } from '@/hooks/useTypingEngine';
 import { TypingArea } from '@/components/typing/TypingArea';
 import { Button } from '@/components/common/Button';
-import { TOPICS, generateChunk } from '@/data/endless-topics';
-import type { TopicId } from '@/data/endless-topics';
+import { TOPICS, generateChunk } from '@/data/endless';
+import type { TopicId } from '@/data/endless';
 import styles from './EndlessPracticePage.module.css';
 
 interface SessionResult {

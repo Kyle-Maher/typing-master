@@ -1,6 +1,6 @@
 import type { Lesson } from '@/types/lesson';
 
-export const homeRowLessons: Lesson[] = [
+export default [
   {
     id: 'hr-1',
     title: 'TH and HE: The Top Two Bigrams',
@@ -73,4 +73,4 @@ export const homeRowLessons: Lesson[] = [
     order: 8,
     text: 'their action of returning information requires attention and intention everything relating to the direction and motion involves thinking reading and learning going through the generation of meaning with ongoing movement and development of communication building understanding',
   },
-];
+] satisfies Lesson[];
