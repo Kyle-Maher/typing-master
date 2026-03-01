@@ -26,8 +26,12 @@
 
 .text {
   line-height: 2.2;
-  word-wrap: break-word;
   user-select: none;
+}
+
+.word {
+  display: inline-block;
+  white-space: nowrap;
 }
 
 .complete {

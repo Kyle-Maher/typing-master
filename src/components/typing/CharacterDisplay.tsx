@@ -2,7 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import styles from './CharacterDisplay.module.css';
 
-export type CharState = 'pending' | 'correct' | 'incorrect' | 'current';
+export type CharState = 'pending' | 'incorrect' | 'current';
 
 interface CharacterDisplayProps {
   char: string;

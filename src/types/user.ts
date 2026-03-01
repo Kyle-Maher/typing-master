@@ -10,6 +10,7 @@ export interface UserSettings {
   soundEnabled: boolean;
   showKeyboard: boolean;
   fontSize: 'small' | 'medium' | 'large';
+  zenMode: boolean;
 }
 
 export interface ErrorDetail {

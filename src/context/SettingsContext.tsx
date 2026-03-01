@@ -12,6 +12,7 @@ const defaultSettings: UserSettings = {
   soundEnabled: true,
   showKeyboard: true,
   fontSize: 'medium',
+  zenMode: false,
 };
 
 const SettingsContext = createContext<SettingsContextValue | null>(null);

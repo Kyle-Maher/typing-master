@@ -29,11 +29,6 @@ export function useSound() {
   const enabled = useRef(settings.soundEnabled);
   enabled.current = settings.soundEnabled;
 
-  const playKeystroke = useCallback(() => {
-    if (!enabled.current) return;
-    playTone(800, 0.05, 0.05);
-  }, []);
-
   const playSuccess = useCallback(() => {
     if (!enabled.current) return;
     playTone(523, 0.1, 0.08);
@@ -46,5 +41,5 @@ export function useSound() {
     playTone(200, 0.15, 0.08);
   }, []);
 
-  return { playKeystroke, playSuccess, playError };
+  return { playSuccess, playError };
 }

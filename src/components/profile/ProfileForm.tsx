@@ -80,6 +80,17 @@ export function ProfileForm() {
           Sound Effects
         </label>
       </div>
+
+      <div className={styles.field}>
+        <label className={styles.checkboxLabel}>
+          <input
+            type="checkbox"
+            checked={settings.zenMode ?? false}
+            onChange={(e) => updateSettings({ zenMode: e.target.checked })}
+          />
+          Zen Mode (hide cursor)
+        </label>
+      </div>
     </div>
   );
 }

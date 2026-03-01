@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { CharacterDisplay, type CharState } from './CharacterDisplay';
 import { useSound } from '@/hooks/useSound';
+import { useSettings } from '@/context/SettingsContext';
 import type { TypingEngine } from '@/hooks/useTypingEngine';
 import styles from './TypingArea.module.css';
 
@@ -12,7 +13,9 @@ export function TypingArea({ engine }: TypingAreaProps) {
   const { text, state, handleKey } = engine;
   const containerRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLSpanElement>(null);
-  const { playKeystroke, playSuccess, playError } = useSound();
+  const { playSuccess, playError } = useSound();
+  const { settings } = useSettings();
+  const zenMode = settings.zenMode;
   const prevCursorRef = useRef(0);
 
   // Stable ref so the keydown listener never needs to be re-attached
@@ -38,18 +41,27 @@ export function TypingArea({ engine }: TypingAreaProps) {
         playSuccess();
       } else if (state.correct[state.cursor - 1] === false) {
         playError();
-      } else {
-        playKeystroke();
       }
     }
     prevCursorRef.current = state.cursor;
-  }, [state.cursor, state.isComplete, state.correct, playKeystroke, playSuccess, playError]);
+  }, [state.cursor, state.isComplete, state.correct, playSuccess, playError]);
 
   const getCharState = (index: number): CharState => {
-    if (index === state.cursor) return 'current';
-    if (index < state.cursor) return state.correct[index] ? 'correct' : 'incorrect';
+    if (index === state.cursor) return zenMode ? 'pending' : 'current';
+    if (index < state.cursor) return state.correct[index] ? 'pending' : 'incorrect';
     return 'pending';
   };
+
+  // Group chars into words (splitting on spaces) to prevent mid-word line breaks
+  const words: { chars: string[]; startIndex: number }[] = [];
+  let wordStart = 0;
+  for (let i = 0; i <= text.length; i++) {
+    if (i === text.length || text[i] === ' ') {
+      if (i > wordStart) words.push({ chars: text.slice(wordStart, i).split(''), startIndex: wordStart });
+      if (i < text.length) words.push({ chars: [' '], startIndex: i });
+      wordStart = i + 1;
+    }
+  }
 
   return (
     <div
@@ -61,9 +73,16 @@ export function TypingArea({ engine }: TypingAreaProps) {
       aria-live="off"
     >
       <div className={styles.text}>
-        {text.split('').map((char, i) => (
-          <span key={i} ref={i === state.cursor ? cursorRef : undefined}>
-            <CharacterDisplay char={char} state={getCharState(i)} />
+        {words.map((word) => (
+          <span key={word.startIndex} className={styles.word}>
+            {word.chars.map((char, j) => {
+              const i = word.startIndex + j;
+              return (
+                <span key={i} ref={i === state.cursor ? cursorRef : undefined}>
+                  <CharacterDisplay char={char} state={getCharState(i)} />
+                </span>
+              );
+            })}
           </span>
         ))}
       </div>

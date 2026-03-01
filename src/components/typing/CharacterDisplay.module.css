@@ -10,10 +10,6 @@
   color: var(--color-text-muted);
 }
 
-.correct {
-  color: var(--color-success);
-}
-
 .incorrect {
   color: var(--color-error);
   background: var(--color-error-light);
