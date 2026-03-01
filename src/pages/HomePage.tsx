@@ -4,8 +4,29 @@ import { useUser } from '@/context/UserContext';
 import { Button } from '@/components/common/Button';
 import styles from './HomePage.module.css';
 
+const MODES = [
+  {
+    route: '/endless',
+    title: 'Endless Practice',
+    description: 'Type continuously without stopping — words keep coming',
+    icon: '∞',
+  },
+  {
+    route: '/lessons',
+    title: 'Typing Lessons',
+    description: 'Structured lessons to build speed and accuracy',
+    icon: '⌨',
+  },
+  {
+    route: '/spelling',
+    title: 'Spelling Practice',
+    description: 'Hear words spoken aloud and type them correctly',
+    icon: '🔊',
+  },
+];
+
 export function HomePage() {
-  const { profile, progress, createProfile } = useUser();
+  const { profile, createProfile } = useUser();
   const navigate = useNavigate();
   const [name, setName] = useState('');
 
@@ -36,60 +57,21 @@ export function HomePage() {
     );
   }
 
-  const completedCount = progress ? Object.keys(progress.completedLessons).length : 0;
-  const totalPoints = progress?.totalPoints ?? 0;
-
   return (
-    <div className={styles.dashboard}>
+    <div className={styles.modeSelector}>
       <div className={styles.hero}>
         <h1 className={styles.greeting}>Welcome back, {profile.name}!</h1>
-        <p className={styles.subtitle}>Ready to practice?</p>
+        <p className={styles.subtitle}>Choose a mode to get started</p>
       </div>
-
-      <div className={styles.statsRow}>
-        <div className={styles.statCard}>
-          <span className={styles.statValue}>{completedCount}</span>
-          <span className={styles.statLabel}>Lessons Done</span>
-        </div>
-        <div className={styles.statCard}>
-          <span className={styles.statValue}>{totalPoints}</span>
-          <span className={styles.statLabel}>Total Points</span>
-        </div>
-        <div className={styles.statCard}>
-          <span className={styles.statValue}>{progress?.currentStreak ?? 0}</span>
-          <span className={styles.statLabel}>Day Streak</span>
-        </div>
+      <div className={styles.modeGrid}>
+        {MODES.map((mode) => (
+          <button key={mode.route} className={styles.modeCard} onClick={() => navigate(mode.route)}>
+            <span className={styles.modeIcon}>{mode.icon}</span>
+            <span className={styles.modeTitle}>{mode.title}</span>
+            <span className={styles.modeDesc}>{mode.description}</span>
+          </button>
+        ))}
       </div>
-
-      <div className={styles.quickStart}>
-        <h2 className={styles.sectionTitle}>Quick Start</h2>
-        <div className={styles.actions}>
-          <Button size="lg" onClick={() => navigate('/lessons')}>
-            Browse Lessons
-          </Button>
-          <Button size="lg" variant="secondary" onClick={() => navigate('/typing')}>
-            Free Practice
-          </Button>
-          <Button size="lg" variant="secondary" onClick={() => navigate('/spelling')}>
-            Spelling Practice
-          </Button>
-        </div>
-      </div>
-
-      {progress && progress.lessonHistory.length > 0 && (
-        <div className={styles.recent}>
-          <h2 className={styles.sectionTitle}>Recent Activity</h2>
-          <div className={styles.recentList}>
-            {progress.lessonHistory.slice(-5).reverse().map((result) => (
-              <div key={result.id} className={styles.recentItem}>
-                <span className={styles.recentLesson}>{result.lessonId}</span>
-                <span className={styles.recentWpm}>{result.wpm} WPM</span>
-                <span className={styles.recentAcc}>{result.accuracy}%</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

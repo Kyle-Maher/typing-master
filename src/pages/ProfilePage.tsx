@@ -8,8 +8,9 @@ import { useToast } from '@/components/common/Toast';
 import styles from './ProfilePage.module.css';
 
 export function ProfilePage() {
-  const { profile, profiles, switchProfile, createProfile } = useUser();
+  const { profile, profiles, switchProfile, createProfile, clearHistory } = useUser();
   const { showToast } = useToast();
+  const [confirmErase, setConfirmErase] = useState(false);
 
   const handleExport = () => {
     if (!profile) return;
@@ -74,6 +75,23 @@ export function ProfilePage() {
         <div className={styles.dataActions}>
           <Button variant="secondary" onClick={handleExport}>Export Progress</Button>
           <Button variant="secondary" onClick={handleImport}>Import Progress</Button>
+        </div>
+        <div className={styles.dangerZone}>
+          {!confirmErase ? (
+            <Button variant="secondary" onClick={() => setConfirmErase(true)}>
+              Erase Lesson History
+            </Button>
+          ) : (
+            <div className={styles.confirmErase}>
+              <span className={styles.confirmText}>This will permanently erase all lesson history, stats, and points. Are you sure?</span>
+              <div className={styles.confirmActions}>
+                <Button variant="secondary" onClick={() => setConfirmErase(false)}>Cancel</Button>
+                <Button variant="secondary" onClick={() => { clearHistory(); setConfirmErase(false); showToast('Lesson history erased', 'success'); }}>
+                  Confirm Erase
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

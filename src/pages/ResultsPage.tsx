@@ -1,13 +1,53 @@
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useCallback, useMemo } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '@/context/UserContext';
 import { Button } from '@/components/common/Button';
+import { getLessonById, getLessonsByCategory } from '@/data/lessons';
 import styles from './ResultsPage.module.css';
 
 export function ResultsPage() {
+  const { lessonId } = useParams();
   const navigate = useNavigate();
   const { progress } = useUser();
 
-  const lastResult = progress?.lessonHistory[progress.lessonHistory.length - 1];
+  const lastResult = useMemo(() => {
+    if (!progress || progress.lessonHistory.length === 0) return undefined;
+    if (lessonId) {
+      // Find the most recent result for this lesson
+      for (let i = progress.lessonHistory.length - 1; i >= 0; i--) {
+        if (progress.lessonHistory[i]!.lessonId === lessonId) {
+          return progress.lessonHistory[i];
+        }
+      }
+    }
+    // Fallback to last entry
+    return progress.lessonHistory[progress.lessonHistory.length - 1];
+  }, [progress, lessonId]);
+
+  const bestResult = progress?.bestResults[lastResult?.lessonId ?? ''];
+  const isNewBest = lastResult != null && bestResult != null && lastResult.id === bestResult.id;
+
+  const goToNextLesson = useCallback(() => {
+    if (!lastResult) return;
+    const lesson = getLessonById(lastResult.lessonId);
+    if (lesson) {
+      const categoryLessons = getLessonsByCategory(lesson.category);
+      const nextLesson = categoryLessons.find((l) => l.order === lesson.order + 1);
+      if (nextLesson) {
+        navigate(`/typing/${nextLesson.id}`);
+        return;
+      }
+    }
+    navigate('/lessons');
+  }, [lastResult, navigate]);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') goToNextLesson();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [goToNextLesson]);
 
   if (!lastResult) {
     return (
@@ -26,6 +66,13 @@ export function ResultsPage() {
     <div className={styles.page}>
       <div className={styles.stars}>{starDisplay}</div>
       <h1 className={styles.title}>Lesson Complete!</h1>
+
+      {isNewBest && (
+        <div className={styles.newBest}>New Personal Best!</div>
+      )}
+      {!isNewBest && bestResult && (
+        <div className={styles.prevBest}>Personal Best: {bestResult.wpm} WPM</div>
+      )}
 
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
@@ -73,7 +120,7 @@ export function ResultsPage() {
         <Button variant="secondary" onClick={() => navigate(`/typing/${lastResult.lessonId}`)}>
           Retry
         </Button>
-        <Button onClick={() => navigate('/lessons')}>
+        <Button onClick={goToNextLesson}>
           Next Lesson
         </Button>
       </div>

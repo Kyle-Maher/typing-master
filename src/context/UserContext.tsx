@@ -1,7 +1,8 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
-import type { UserProfile, UserProgress, LessonResult } from '@/types/user';
+import type { UserProfile, UserProgress, LessonResult, SpellingResult } from '@/types/user';
 import * as storage from '@/services/storage';
 import { updateStreak } from '@/utils/streak';
+import { getLessonById } from '@/data/lessons';
 
 interface UserContextValue {
   profile: UserProfile | null;
@@ -12,6 +13,8 @@ interface UserContextValue {
   updateProfile: (profile: UserProfile) => void;
   updateProgress: (progress: UserProgress) => void;
   addLessonResult: (result: LessonResult) => void;
+  addSpellingResult: (result: SpellingResult) => void;
+  clearHistory: () => void;
 }
 
 const UserContext = createContext<UserContextValue | null>(null);
@@ -75,6 +78,32 @@ export function UserProvider({ children }: { children: ReactNode }) {
       }
       updated.problemKeys = newProblemKeys;
 
+      // Extract problem words from error positions
+      const lesson = getLessonById(result.lessonId, progress.customWordLists);
+      if (lesson && result.errors.length > 0) {
+        const text = lesson.text;
+        const newProblemWords = { ...progress.problemWords };
+        const errorPositions = new Set(result.errors.map((e) => e.position));
+        // Find which word each error position falls in
+        let charIdx = 0;
+        for (const word of text.split(/\s+/)) {
+          const wordEnd = charIdx + word.length;
+          for (let i = charIdx; i < wordEnd; i++) {
+            if (errorPositions.has(i)) {
+              newProblemWords[word.toLowerCase()] = (newProblemWords[word.toLowerCase()] ?? 0) + 1;
+              break; // count each word at most once per error pass
+            }
+          }
+          charIdx = wordEnd + 1; // +1 for the space
+        }
+        updated.problemWords = newProblemWords;
+      }
+
+      // Cap lesson history to 500 entries
+      if (updated.lessonHistory.length > 500) {
+        updated.lessonHistory = updated.lessonHistory.slice(-500);
+      }
+
       // Update streak
       const streakUpdate = updateStreak(progress.currentStreak, progress.longestStreak, progress.lastPracticeDate);
       updated.currentStreak = streakUpdate.currentStreak;
@@ -85,6 +114,46 @@ export function UserProvider({ children }: { children: ReactNode }) {
     },
     [progress, handleUpdateProgress],
   );
+
+  const handleAddSpellingResult = useCallback(
+    (result: SpellingResult) => {
+      if (!progress) return;
+      const spellingHistory = [...(progress.spellingHistory ?? []), result];
+      if (spellingHistory.length > 500) {
+        spellingHistory.splice(0, spellingHistory.length - 500);
+      }
+      const updated: UserProgress = {
+        ...progress,
+        spellingHistory,
+        totalPoints: progress.totalPoints + result.points,
+      };
+
+      const streakUpdate = updateStreak(progress.currentStreak, progress.longestStreak, progress.lastPracticeDate);
+      updated.currentStreak = streakUpdate.currentStreak;
+      updated.longestStreak = streakUpdate.longestStreak;
+      updated.lastPracticeDate = new Date().toISOString().split('T')[0]!;
+
+      handleUpdateProgress(updated);
+    },
+    [progress, handleUpdateProgress],
+  );
+
+  const handleClearHistory = useCallback(() => {
+    if (!progress) return;
+    handleUpdateProgress({
+      ...progress,
+      completedLessons: {},
+      bestResults: {},
+      lessonHistory: [],
+      spellingHistory: [],
+      totalPoints: 0,
+      currentStreak: 0,
+      longestStreak: 0,
+      lastPracticeDate: null,
+      problemKeys: {},
+      problemWords: {},
+    });
+  }, [progress, handleUpdateProgress]);
 
   return (
     <UserContext.Provider
@@ -97,6 +166,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
         updateProfile: handleUpdateProfile,
         updateProgress: handleUpdateProgress,
         addLessonResult: handleAddLessonResult,
+        addSpellingResult: handleAddSpellingResult,
+        clearHistory: handleClearHistory,
       }}
     >
       {children}

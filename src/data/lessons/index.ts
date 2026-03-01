@@ -43,18 +43,21 @@ export function getLessonsByDifficulty(difficulty: DifficultyLevel): Lesson[] {
 
 export function getCategories(): { id: LessonCategory; label: string }[] {
   return [
-    { id: 'home-row', label: 'Home Row' },
-    { id: 'common-words', label: 'Common Words' },
-    { id: 'sentences', label: 'Sentences' },
-    { id: 'paragraphs', label: 'Paragraphs' },
+    { id: 'home-row', label: 'Digraphs & Chunks' },
+    { id: 'common-words', label: 'High-Frequency Words' },
+    { id: 'sentences', label: 'Accuracy Training' },
+    { id: 'paragraphs', label: 'Speed Building' },
     { id: 'custom', label: 'Custom' },
   ];
 }
 
-/** Check if a lesson is unlocked. First in each category is free; rest require 80%+ on previous. */
+/** Check if a lesson is unlocked. First in each category is free; rest require 80%+ on previous.
+ *  When bestResults is provided, it's preferred for the accuracy check (prevents re-locking on poor retry).
+ */
 export function isLessonUnlocked(
   lessonId: string,
   completedLessons: Record<string, { accuracy: number }>,
+  bestResults?: Record<string, { accuracy: number }>,
 ): boolean {
   const lesson = getLessonById(lessonId);
   if (!lesson) return false;
@@ -70,6 +73,7 @@ export function isLessonUnlocked(
   const prevLesson = categoryLessons.find((l) => l.order === lesson.order - 1);
   if (!prevLesson) return true;
 
-  const prevResult = completedLessons[prevLesson.id];
+  // Prefer bestResults to avoid re-locking when a retry scores lower
+  const prevResult = bestResults?.[prevLesson.id] ?? completedLessons[prevLesson.id];
   return prevResult !== undefined && prevResult.accuracy >= 80;
 }

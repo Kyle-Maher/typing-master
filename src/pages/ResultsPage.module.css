@@ -81,6 +81,21 @@
   font-weight: 600;
 }
 
+.newBest {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  font-size: var(--text-lg);
+  animation: popIn 0.6s ease;
+}
+
+.prevBest {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
 .actions {
   display: flex;
   gap: var(--space-md);

@@ -36,21 +36,27 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <div className={styles.container} aria-live="polite">
         {toasts.map((toast) => (
-          <ToastItem key={toast.id} toast={toast} onDone={() => removeToast(toast.id)} />
+          <ToastItemComponent key={toast.id} toast={toast} onDone={() => removeToast(toast.id)} />
         ))}
       </div>
     </ToastContext.Provider>
   );
 }
 
-function ToastItem({ toast, onDone }: { toast: ToastItem; onDone: () => void }) {
+function ToastItemComponent({ toast, onDone }: { toast: ToastItem; onDone: () => void }) {
+  const [leaving, setLeaving] = useState(false);
+
   useEffect(() => {
-    const timer = setTimeout(onDone, 3000);
-    return () => clearTimeout(timer);
+    const leaveTimer = setTimeout(() => setLeaving(true), 2700);
+    const removeTimer = setTimeout(onDone, 3000);
+    return () => {
+      clearTimeout(leaveTimer);
+      clearTimeout(removeTimer);
+    };
   }, [onDone]);
 
   return (
-    <div className={`${styles.toast} ${styles[toast.type]}`}>
+    <div className={`${styles.toast} ${styles[toast.type]} ${leaving ? styles.leaving : ''}`}>
       {toast.message}
     </div>
   );

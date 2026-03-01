@@ -11,6 +11,7 @@ import { SpellingPracticePage } from '@/pages/SpellingPracticePage';
 import { StatsPage } from '@/pages/StatsPage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { ResultsPage } from '@/pages/ResultsPage';
+import { EndlessPracticePage } from '@/pages/EndlessPracticePage';
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
                 <Route path="/stats" element={<StatsPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/results/:lessonId" element={<ResultsPage />} />
+                <Route path="/endless" element={<EndlessPracticePage />} />
               </Routes>
             </main>
           </ToastProvider>

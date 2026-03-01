@@ -66,10 +66,11 @@ export function LessonList() {
             <LessonCard
               key={lesson.id}
               lesson={lesson}
-              isUnlocked={isLessonUnlocked(lesson.id, completedLessons)}
+              isUnlocked={isLessonUnlocked(lesson.id, completedLessons, bestResults)}
               isCompleted={!!completedLessons[lesson.id]}
               bestWpm={best?.wpm}
               bestAccuracy={best?.accuracy}
+              bestStars={best?.stars}
             />
           );
         })}

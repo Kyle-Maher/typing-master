@@ -41,10 +41,11 @@
   border-color: var(--color-primary);
 }
 
-.dashboard {
+.modeSelector {
   padding: var(--space-xl) 0;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--space-2xl);
   animation: fadeIn 0.3s ease;
 }
@@ -58,83 +59,49 @@
   font-weight: 700;
 }
 
-.statsRow {
+.modeGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: var(--space-md);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-lg);
+  width: 100%;
+  max-width: 800px;
 }
 
-.statCard {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
+.modeCard {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-md);
+  padding: var(--space-2xl) var(--space-lg);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  color: var(--color-text);
 }
 
-.statValue {
-  font-size: var(--text-3xl);
-  font-weight: 800;
-  color: var(--color-primary);
+.modeCard:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
 }
 
-.statLabel {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
+.modeIcon {
+  font-size: 2.5rem;
+  line-height: 1;
 }
 
-.sectionTitle {
+.modeTitle {
   font-size: var(--text-xl);
   font-weight: 700;
-  margin-bottom: var(--space-md);
 }
 
-.actions {
-  display: flex;
-  gap: var(--space-md);
-  flex-wrap: wrap;
-}
-
-.quickStart {
-  text-align: center;
-}
-
-.recent {
-  text-align: left;
-}
-
-.recentList {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.recentItem {
-  display: flex;
-  gap: var(--space-lg);
-  padding: var(--space-sm) var(--space-md);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+.modeDesc {
   font-size: var(--text-sm);
-}
-
-.recentLesson {
-  flex: 1;
-  font-weight: 500;
-}
-
-.recentWpm {
-  color: var(--color-primary);
-  font-weight: 600;
-}
-
-.recentAcc {
-  color: var(--color-success);
-  font-weight: 600;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
 }
 
 @keyframes fadeIn {

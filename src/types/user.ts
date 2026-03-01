@@ -34,6 +34,18 @@ export interface LessonResult {
   completedAt: string;
 }
 
+export interface SpellingResult {
+  id: string;
+  lessonId: string;
+  profileId: string;
+  correctCount: number;
+  totalWords: number;
+  accuracy: number;
+  results: { word: string; correct: boolean; attempts: number }[];
+  points: number;
+  completedAt: string;
+}
+
 export interface CustomWordList {
   id: string;
   name: string;
@@ -53,4 +65,5 @@ export interface UserProgress {
   problemWords: Record<string, number>;
   customWordLists: CustomWordList[];
   lessonHistory: LessonResult[];
+  spellingHistory: SpellingResult[];
 }

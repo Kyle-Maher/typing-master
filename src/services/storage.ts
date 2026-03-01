@@ -101,6 +101,7 @@ function createDefaultProgress(profileId: string): UserProgress {
     problemWords: {},
     customWordLists: [],
     lessonHistory: [],
+    spellingHistory: [],
   };
 }
 

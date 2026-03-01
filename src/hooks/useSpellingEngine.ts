@@ -28,18 +28,36 @@ export interface SpellingEngine {
 
 const SPEECH_FALLBACK_TIMEOUT = 5000;
 
-function speakWord(word: string, onEnd?: () => void): SpeechSynthesisUtterance | null {
+/** Words whose spelling‑out pronunciation differs from normal reading. */
+const pronunciationMap: Record<string, string> = {
+  the: 'thee',
+};
+
+/**
+ * Speak a word using the Web Speech API.
+ * Returns a cancel function that aborts both the delay and the utterance.
+ * A short delay after cancel() is needed to work around a Chrome bug where
+ * speak() silently fails if called synchronously after cancel().
+ */
+function speakWord(word: string, onEnd?: () => void): () => void {
   if (typeof window === 'undefined' || !window.speechSynthesis) {
     onEnd?.();
-    return null;
+    return () => {};
   }
   window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(word);
-  utterance.rate = 0.8;
-  if (onEnd) utterance.onend = onEnd;
-  if (onEnd) utterance.onerror = onEnd;
-  window.speechSynthesis.speak(utterance);
-  return utterance;
+  const textToSpeak = pronunciationMap[word.toLowerCase()] ?? word;
+  const delayId = setTimeout(() => {
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    utterance.lang = 'en-US';
+    utterance.rate = 0.8;
+    if (onEnd) utterance.onend = onEnd;
+    if (onEnd) utterance.onerror = onEnd;
+    window.speechSynthesis.speak(utterance);
+  }, 50);
+  return () => {
+    clearTimeout(delayId);
+    window.speechSynthesis?.cancel();
+  };
 }
 
 export function useSpellingEngine(words: SpellingWord[]): SpellingEngine {
@@ -58,6 +76,8 @@ export function useSpellingEngine(words: SpellingWord[]): SpellingEngine {
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const currentWord = words[state.currentIndex];
 
+  const cancelSpeechRef = useRef<(() => void) | null>(null);
+
   // Speak word and transition to typing phase
   useEffect(() => {
     if (state.phase === 'showing' && currentWord) {
@@ -65,12 +85,39 @@ export function useSpellingEngine(words: SpellingWord[]): SpellingEngine {
         clearTimeout(timerRef.current);
         setState((prev) => (prev.phase === 'showing' ? { ...prev, phase: 'typing' } : prev));
       };
-      speakWord(currentWord.word, transitionToTyping);
-      // Fallback in case speech doesn't fire onend
-      timerRef.current = setTimeout(transitionToTyping, SPEECH_FALLBACK_TIMEOUT);
+
+      const speak = () => {
+        cancelSpeechRef.current = speakWord(currentWord.word, transitionToTyping);
+        // Fallback in case speech doesn't fire onend
+        timerRef.current = setTimeout(transitionToTyping, SPEECH_FALLBACK_TIMEOUT);
+      };
+
+      // On first mount, voices may not be loaded yet. Wait for them before speaking.
+      if (window.speechSynthesis && window.speechSynthesis.getVoices().length === 0) {
+        let spoken = false;
+        const speakOnce = () => {
+          if (spoken) return;
+          spoken = true;
+          window.speechSynthesis?.removeEventListener('voiceschanged', onVoices);
+          clearTimeout(timerRef.current);
+          speak();
+        };
+        const onVoices = () => speakOnce();
+        window.speechSynthesis.addEventListener('voiceschanged', onVoices);
+        // Fallback in case voiceschanged never fires (some browsers)
+        timerRef.current = setTimeout(speakOnce, SPEECH_FALLBACK_TIMEOUT);
+        return () => {
+          spoken = true;
+          clearTimeout(timerRef.current);
+          window.speechSynthesis?.removeEventListener('voiceschanged', onVoices);
+          cancelSpeechRef.current?.();
+        };
+      }
+
+      speak();
       return () => {
         clearTimeout(timerRef.current);
-        window.speechSynthesis?.cancel();
+        cancelSpeechRef.current?.();
       };
     }
   }, [state.phase, state.currentIndex, currentWord]);

@@ -77,3 +77,8 @@
   color: var(--color-primary);
   margin-top: var(--space-xs);
 }
+
+.stars {
+  color: var(--color-warning);
+  letter-spacing: 1px;
+}

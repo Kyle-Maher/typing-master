@@ -12,6 +12,7 @@ export interface TypingState {
   problemKeys: Record<string, number>;
   isComplete: boolean;
   isStarted: boolean;
+  lastErrorKey: string | null;
 }
 
 export interface TypingEngine {
@@ -23,6 +24,7 @@ export interface TypingEngine {
   errorCount: number;
   handleKey: (key: string) => void;
   reset: (newText?: string) => void;
+  forceComplete: () => void;
   text: string;
 }
 
@@ -40,6 +42,7 @@ export function useTypingEngine(initialText: string): TypingEngine {
     problemKeys: {},
     isComplete: false,
     isStarted: false,
+    lastErrorKey: null,
   }));
 
   // Keep refs so handleKey can read current values without re-creating
@@ -94,7 +97,7 @@ export function useTypingEngine(initialText: string): TypingEngine {
           const newCursor = prev.cursor - 1;
           const newTyped = prev.typed.slice(0, -1);
           const newCorrect = prev.correct.slice(0, -1);
-          return { ...prev, cursor: newCursor, typed: newTyped, correct: newCorrect, isStarted: true };
+          return { ...prev, cursor: newCursor, typed: newTyped, correct: newCorrect, isStarted: true, lastErrorKey: null };
         }
 
         // Normal character
@@ -132,6 +135,7 @@ export function useTypingEngine(initialText: string): TypingEngine {
             problemKeys: newProblemKeys,
             isComplete,
             isStarted: true,
+            lastErrorKey: isCorrect ? null : expected,
           };
         }
 
@@ -140,6 +144,11 @@ export function useTypingEngine(initialText: string): TypingEngine {
     },
     [], // stable — reads everything through refs or setState prev
   );
+
+  const forceComplete = useCallback(() => {
+    needsTimerStop.current = true;
+    setState((prev) => (prev.isStarted && !prev.isComplete ? { ...prev, isComplete: true } : prev));
+  }, []);
 
   const reset = useCallback(
     (newText?: string) => {
@@ -155,6 +164,7 @@ export function useTypingEngine(initialText: string): TypingEngine {
         problemKeys: {},
         isComplete: false,
         isStarted: false,
+        lastErrorKey: null,
       });
     },
     [timer],
@@ -169,6 +179,7 @@ export function useTypingEngine(initialText: string): TypingEngine {
     errorCount: state.errors.length,
     handleKey,
     reset,
+    forceComplete,
     text,
   };
 }
