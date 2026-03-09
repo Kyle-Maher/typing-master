@@ -75,8 +75,6 @@ export function useDictationEngine(passageText: string): DictationEngine {
 
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const cancelSpeechRef = useRef<(() => void) | null>(null);
-  const passageTextRef = useRef(passageText);
-  passageTextRef.current = passageText;
 
   // When phase transitions to 'listening', speak the passage
   useEffect(() => {
@@ -88,7 +86,7 @@ export function useDictationEngine(passageText: string): DictationEngine {
     };
 
     const speak = () => {
-      cancelSpeechRef.current = speakPassage(passageTextRef.current, transitionToTyping);
+      cancelSpeechRef.current = speakPassage(passageText, transitionToTyping);
       timerRef.current = setTimeout(transitionToTyping, SPEECH_FALLBACK_TIMEOUT);
     };
 
@@ -118,7 +116,7 @@ export function useDictationEngine(passageText: string): DictationEngine {
       clearTimeout(timerRef.current);
       cancelSpeechRef.current?.();
     };
-  }, [state.phase, state.replayCount]);
+  }, [state.phase, state.replayCount, passageText]);
 
   const startListening = useCallback(() => {
     setState((prev) => (prev.phase === 'idle' ? { ...prev, phase: 'listening' } : prev));
@@ -131,10 +129,10 @@ export function useDictationEngine(passageText: string): DictationEngine {
   const submitAnswer = useCallback(() => {
     setState((prev) => {
       if (prev.phase !== 'typing') return prev;
-      const score = computeCoverageScore(passageTextRef.current, prev.input);
+      const score = computeCoverageScore(passageText, prev.input);
       return { ...prev, phase: 'done', coverageScore: score };
     });
-  }, []);
+  }, [passageText]);
 
   const replayPassage = useCallback(() => {
     setState((prev) => {
@@ -147,11 +145,11 @@ export function useDictationEngine(passageText: string): DictationEngine {
   // Re-speak when replayCount increments during typing phase
   useEffect(() => {
     if (state.phase !== 'typing' || state.replayCount === 0) return;
-    cancelSpeechRef.current = speakPassage(passageTextRef.current);
+    cancelSpeechRef.current = speakPassage(passageText);
     return () => {
       cancelSpeechRef.current?.();
     };
-  }, [state.replayCount, state.phase]);
+  }, [state.replayCount, state.phase, passageText]);
 
   const reset = useCallback(() => {
     cancelSpeechRef.current?.();
