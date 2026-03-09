@@ -23,6 +23,12 @@ const MODES = [
     description: 'Hear words spoken aloud and type them correctly',
     icon: '🔊',
   },
+  {
+    route: '/dictation',
+    title: 'Dictation Practice',
+    description: 'Listen to passages and type what you hear',
+    icon: '🎧',
+  },
 ];
 
 export function HomePage() {
