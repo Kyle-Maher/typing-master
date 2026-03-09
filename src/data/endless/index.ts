@@ -36,11 +36,12 @@ function seededShuffle<T>(arr: T[], seed: number): T[] {
 export function generateChunk(topicId: TopicId, targetWords = 60, chunkIndex = 0): string {
   if (topicId === 'stories' || topicId === 'poems') {
     const sentences = topicId === 'stories' ? STORY_SENTENCES : POEM_LINES;
+    const shuffled = seededShuffle(sentences, chunkIndex + 1);
     const result: string[] = [];
     let wordCount = 0;
-    let i = chunkIndex % sentences.length;
+    let i = 0;
     while (wordCount < targetWords) {
-      const sentence = sentences[i % sentences.length]!;
+      const sentence = shuffled[i % shuffled.length]!;
       result.push(sentence);
       wordCount += sentence.split(' ').length;
       i++;
