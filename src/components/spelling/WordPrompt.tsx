@@ -4,13 +4,16 @@ import styles from './WordPrompt.module.css';
 interface WordPromptProps {
   word: string;
   hint?: string;
+  sentence?: string;
   phase: SpellingPhase;
   showHint: boolean;
+  showSentence: boolean;
   onRevealHint: () => void;
+  onRevealSentence: () => void;
   onReplay: () => void;
 }
 
-export function WordPrompt({ word, hint, phase, showHint, onRevealHint, onReplay }: WordPromptProps) {
+export function WordPrompt({ word, hint, sentence, phase, showHint, showSentence, onRevealHint, onRevealSentence, onReplay }: WordPromptProps) {
   return (
     <div className={styles.prompt}>
       <div className={styles.wordContainer}>
@@ -33,6 +36,15 @@ export function WordPrompt({ word, hint, phase, showHint, onRevealHint, onReplay
             ) : (
               <button className={styles.hintButton} onClick={onRevealHint}>
                 Show Hint
+              </button>
+            )
+          )}
+          {sentence && (
+            showSentence ? (
+              <p className={styles.hint}>{sentence}</p>
+            ) : (
+              <button className={styles.hintButton} onClick={onRevealSentence}>
+                Show in Sentence
               </button>
             )
           )}

@@ -12,6 +12,7 @@ export interface SpellingState {
   maxAttempts: number;
   results: { word: string; correct: boolean; attempts: number }[];
   showHint: boolean;
+  showSentence: boolean;
   correctCount: number;
   totalWords: number;
 }
@@ -23,6 +24,7 @@ export interface SpellingEngine {
   submitAnswer: () => void;
   nextWord: () => void;
   revealHint: () => void;
+  revealSentence: () => void;
   replayWord: () => void;
   reset: () => void;
 }
@@ -85,6 +87,7 @@ export function useSpellingEngine(words: SpellingWord[]): SpellingEngine {
     maxAttempts: 3,
     results: [],
     showHint: false,
+    showSentence: false,
     correctCount: 0,
     totalWords: words.length,
   }));
@@ -182,6 +185,7 @@ export function useSpellingEngine(words: SpellingWord[]): SpellingEngine {
         input: '',
         attempt: 1,
         showHint: false,
+        showSentence: false,
       };
     });
   }, []);
@@ -194,6 +198,10 @@ export function useSpellingEngine(words: SpellingWord[]): SpellingEngine {
     setState((prev) => ({ ...prev, showHint: true }));
   }, []);
 
+  const revealSentence = useCallback(() => {
+    setState((prev) => ({ ...prev, showSentence: true }));
+  }, []);
+
   const reset = useCallback(() => {
     setState({
       currentIndex: 0,
@@ -203,10 +211,11 @@ export function useSpellingEngine(words: SpellingWord[]): SpellingEngine {
       maxAttempts: 3,
       results: [],
       showHint: false,
+      showSentence: false,
       correctCount: 0,
       totalWords: words.length,
     });
   }, [words.length]);
 
-  return { state, currentWord, setInput, submitAnswer, nextWord, revealHint, replayWord, reset };
+  return { state, currentWord, setInput, submitAnswer, nextWord, revealHint, revealSentence, replayWord, reset };
 }

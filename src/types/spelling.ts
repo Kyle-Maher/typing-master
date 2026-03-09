@@ -1,6 +1,7 @@
 export interface SpellingWord {
   word: string;
   hint?: string;
+  sentence?: string;
   difficulty: number; // 1-5
 }
 

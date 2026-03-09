@@ -122,9 +122,12 @@ function SpellingSession({ lessonId, lesson, onBack }: { lessonId: string; lesso
         <WordPrompt
           word={engine.currentWord.word}
           hint={engine.currentWord.hint}
+          sentence={engine.currentWord.sentence}
           phase={engine.state.phase}
           showHint={engine.state.showHint}
+          showSentence={engine.state.showSentence}
           onRevealHint={engine.revealHint}
+          onRevealSentence={engine.revealSentence}
           onReplay={engine.replayWord}
         />
       )}
