@@ -52,6 +52,7 @@ const DEFAULT_SETTINGS: UserSettings = {
   soundEnabled: true,
   showKeyboard: true,
   fontSize: 'medium',
+  zenMode: false,
 };
 
 export function createProfile(name: string): UserProfile {
@@ -102,6 +103,7 @@ function createDefaultProgress(profileId: string): UserProgress {
     customWordLists: [],
     lessonHistory: [],
     spellingHistory: [],
+    dictationHistory: [],
   };
 }
 

@@ -47,6 +47,16 @@ export interface SpellingResult {
   completedAt: string;
 }
 
+export interface DictationResult {
+  id: string;
+  passageId: string;
+  profileId: string;
+  coverageScore: number; // 0–100
+  typedText: string;
+  points: number;
+  completedAt: string;
+}
+
 export interface CustomWordList {
   id: string;
   name: string;
@@ -67,4 +77,5 @@ export interface UserProgress {
   customWordLists: CustomWordList[];
   lessonHistory: LessonResult[];
   spellingHistory: SpellingResult[];
+  dictationHistory: DictationResult[];
 }

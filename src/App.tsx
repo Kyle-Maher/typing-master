@@ -12,6 +12,7 @@ import { StatsPage } from '@/pages/StatsPage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { ResultsPage } from '@/pages/ResultsPage';
 import { EndlessPracticePage } from '@/pages/EndlessPracticePage';
+import { DictationPage } from '@/pages/DictationPage';
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
                 <Route path="/typing" element={<TypingPracticePage />} />
                 <Route path="/typing/:lessonId" element={<TypingPracticePage />} />
                 <Route path="/spelling" element={<SpellingPracticePage />} />
+                <Route path="/dictation" element={<DictationPage />} />
                 <Route path="/stats" element={<StatsPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/results/:lessonId" element={<ResultsPage />} />

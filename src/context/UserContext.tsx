@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
-import type { UserProfile, UserProgress, LessonResult, SpellingResult } from '@/types/user';
+import type { UserProfile, UserProgress, LessonResult, SpellingResult, DictationResult } from '@/types/user';
 import * as storage from '@/services/storage';
 import { updateStreak } from '@/utils/streak';
 import { getLessonById } from '@/data/lessons';
@@ -14,6 +14,7 @@ interface UserContextValue {
   updateProgress: (progress: UserProgress) => void;
   addLessonResult: (result: LessonResult) => void;
   addSpellingResult: (result: SpellingResult) => void;
+  addDictationResult: (result: DictationResult) => void;
   clearHistory: () => void;
 }
 
@@ -138,6 +139,29 @@ export function UserProvider({ children }: { children: ReactNode }) {
     [progress, handleUpdateProgress],
   );
 
+  const handleAddDictationResult = useCallback(
+    (result: DictationResult) => {
+      if (!progress) return;
+      const dictationHistory = [...(progress.dictationHistory ?? []), result];
+      if (dictationHistory.length > 500) {
+        dictationHistory.splice(0, dictationHistory.length - 500);
+      }
+      const updated: UserProgress = {
+        ...progress,
+        dictationHistory,
+        totalPoints: progress.totalPoints + result.points,
+      };
+
+      const streakUpdate = updateStreak(progress.currentStreak, progress.longestStreak, progress.lastPracticeDate);
+      updated.currentStreak = streakUpdate.currentStreak;
+      updated.longestStreak = streakUpdate.longestStreak;
+      updated.lastPracticeDate = new Date().toISOString().split('T')[0]!;
+
+      handleUpdateProgress(updated);
+    },
+    [progress, handleUpdateProgress],
+  );
+
   const handleClearHistory = useCallback(() => {
     if (!progress) return;
     handleUpdateProgress({
@@ -146,6 +170,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       bestResults: {},
       lessonHistory: [],
       spellingHistory: [],
+      dictationHistory: [],
       totalPoints: 0,
       currentStreak: 0,
       longestStreak: 0,
@@ -167,6 +192,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         updateProgress: handleUpdateProgress,
         addLessonResult: handleAddLessonResult,
         addSpellingResult: handleAddSpellingResult,
+        addDictationResult: handleAddDictationResult,
         clearHistory: handleClearHistory,
       }}
     >
