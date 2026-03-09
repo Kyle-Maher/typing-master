@@ -53,6 +53,8 @@ const DEFAULT_SETTINGS: UserSettings = {
   showKeyboard: true,
   fontSize: 'medium',
   zenMode: false,
+  voiceName: null,
+  speechRate: 0.8,
 };
 
 export function createProfile(name: string): UserProfile {

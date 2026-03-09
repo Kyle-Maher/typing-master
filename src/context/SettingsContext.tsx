@@ -13,6 +13,8 @@ const defaultSettings: UserSettings = {
   showKeyboard: true,
   fontSize: 'medium',
   zenMode: false,
+  voiceName: null,
+  speechRate: 0.8,
 };
 
 const SettingsContext = createContext<SettingsContextValue | null>(null);

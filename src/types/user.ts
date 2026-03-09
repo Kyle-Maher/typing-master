@@ -11,6 +11,8 @@ export interface UserSettings {
   showKeyboard: boolean;
   fontSize: 'small' | 'medium' | 'large';
   zenMode: boolean;
+  voiceName: string | null;
+  speechRate: number;
 }
 
 export interface ErrorDetail {

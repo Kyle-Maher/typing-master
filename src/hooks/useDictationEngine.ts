@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useSettings } from '@/context/SettingsContext';
 
 export type DictationPhase = 'idle' | 'listening' | 'typing' | 'done';
 
@@ -45,7 +46,12 @@ function computeCoverageScore(passageText: string, typedText: string): number {
  * Returns a cancel function. 50ms delay after cancel() works around a Chrome
  * bug where speak() silently fails if called synchronously after cancel().
  */
-function speakPassage(text: string, onEnd?: () => void): () => void {
+function speakPassage(
+  text: string,
+  voiceName: string | null,
+  rate: number,
+  onEnd?: () => void,
+): () => void {
   if (typeof window === 'undefined' || !window.speechSynthesis) {
     onEnd?.();
     return () => {};
@@ -54,7 +60,11 @@ function speakPassage(text: string, onEnd?: () => void): () => void {
   const delayId = setTimeout(() => {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-US';
-    utterance.rate = 0.9;
+    utterance.rate = rate;
+    const voice = voiceName
+      ? window.speechSynthesis.getVoices().find((v) => v.name === voiceName) ?? null
+      : null;
+    utterance.voice = voice;
     if (onEnd) utterance.onend = onEnd;
     if (onEnd) utterance.onerror = onEnd;
     window.speechSynthesis.speak(utterance);
@@ -66,6 +76,12 @@ function speakPassage(text: string, onEnd?: () => void): () => void {
 }
 
 export function useDictationEngine(passageText: string): DictationEngine {
+  const { settings } = useSettings();
+  const voiceNameRef = useRef(settings.voiceName);
+  voiceNameRef.current = settings.voiceName;
+  const speechRateRef = useRef(settings.speechRate);
+  speechRateRef.current = settings.speechRate;
+
   const [state, setState] = useState<DictationState>({
     phase: 'idle',
     input: '',
@@ -86,7 +102,7 @@ export function useDictationEngine(passageText: string): DictationEngine {
     };
 
     const speak = () => {
-      cancelSpeechRef.current = speakPassage(passageText, transitionToTyping);
+      cancelSpeechRef.current = speakPassage(passageText, voiceNameRef.current, speechRateRef.current, transitionToTyping);
       timerRef.current = setTimeout(transitionToTyping, SPEECH_FALLBACK_TIMEOUT);
     };
 
@@ -145,7 +161,7 @@ export function useDictationEngine(passageText: string): DictationEngine {
   // Re-speak when replayCount increments during typing phase
   useEffect(() => {
     if (state.phase !== 'typing' || state.replayCount === 0) return;
-    cancelSpeechRef.current = speakPassage(passageText);
+    cancelSpeechRef.current = speakPassage(passageText, voiceNameRef.current, speechRateRef.current);
     return () => {
       cancelSpeechRef.current?.();
     };
