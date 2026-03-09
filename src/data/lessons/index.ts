@@ -59,14 +59,14 @@ export function isLessonUnlocked(
   completedLessons: Record<string, { accuracy: number }>,
   bestResults?: Record<string, { accuracy: number }>,
 ): boolean {
+  // Custom lessons are always unlocked (getLessonById needs customLists which isn't available here)
+  if (lessonId.startsWith('custom-')) return true;
+
   const lesson = getLessonById(lessonId);
   if (!lesson) return false;
 
   // First lesson in category is always unlocked
   if (lesson.order === 1) return true;
-
-  // Custom lessons are always unlocked
-  if (lesson.category === 'custom') return true;
 
   // Find previous lesson in same category
   const categoryLessons = getLessonsByCategory(lesson.category);

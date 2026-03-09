@@ -15,7 +15,12 @@ export function LessonList() {
   const bestResults = progress?.bestResults ?? {};
   const customLists = progress?.customWordLists;
 
-  let lessons = activeCategory === 'all' ? getAllLessons(customLists) : getLessonsByCategory(activeCategory as LessonCategory);
+  let lessons =
+    activeCategory === 'all'
+      ? getAllLessons(customLists)
+      : activeCategory === 'custom'
+        ? getAllLessons(customLists).filter((l) => l.category === 'custom')
+        : getLessonsByCategory(activeCategory as LessonCategory);
   if (activeDifficulty !== 'all') {
     lessons = lessons.filter((l) => l.difficulty === activeDifficulty);
   }
@@ -37,7 +42,7 @@ export function LessonList() {
           >
             All
           </button>
-          {categories.filter(c => c.id !== 'custom').map((cat) => (
+          {categories.filter((c) => c.id !== 'custom' || (customLists && customLists.length > 0)).map((cat) => (
             <button
               key={cat.id}
               className={`${styles.tab} ${activeCategory === cat.id ? styles.activeTab : ''}`}
