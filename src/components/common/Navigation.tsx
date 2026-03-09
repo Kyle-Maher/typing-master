@@ -5,10 +5,10 @@ import styles from './Navigation.module.css';
 
 const navItems = [
   { to: '/', label: 'Home' },
-  { to: '/endless', label: 'Endless Practice' },
-  { to: '/lessons', label: 'Typing Lessons' },
-  { to: '/spelling', label: 'Spelling Practice' },
-  { to: '/dictation', label: 'Dictation Practice' },
+  { to: '/endless', label: 'Practice' },
+  { to: '/lessons', label: 'Lessons' },
+  { to: '/spelling', label: 'Spelling' },
+  { to: '/dictation', label: 'Dictation' },
   { to: '/stats', label: 'Stats' },
   { to: '/profile', label: 'Profile' },
 ];
