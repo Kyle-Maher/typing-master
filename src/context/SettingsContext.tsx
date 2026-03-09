@@ -8,12 +8,12 @@ interface SettingsContextValue {
 }
 
 const defaultSettings: UserSettings = {
-  theme: 'light',
+  theme: 'dark',
   soundEnabled: true,
-  showKeyboard: true,
+  showKeyboard: false,
   fontSize: 'medium',
   zenMode: false,
-  voiceName: null,
+  voiceName: 'Google UK English Male',
   speechRate: 0.8,
 };
 

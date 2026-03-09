@@ -48,12 +48,12 @@ export function setActiveProfileId(id: string): void {
 }
 
 const DEFAULT_SETTINGS: UserSettings = {
-  theme: 'light',
+  theme: 'dark',
   soundEnabled: true,
-  showKeyboard: true,
+  showKeyboard: false,
   fontSize: 'medium',
   zenMode: false,
-  voiceName: null,
+  voiceName: 'Google UK English Male',
   speechRate: 0.8,
 };
 
