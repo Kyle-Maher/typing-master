@@ -38,11 +38,25 @@ function EndlessSession({ topic, onEnd }: EndlessSessionProps) {
     chunksCompleted: 0,
     chunkIndex: 0,
   });
+  const [liveWpm, setLiveWpm] = useState(0);
+  const [liveAccuracy, setLiveAccuracy] = useState(100);
 
   const accRef = useRef(accumulated);
   accRef.current = accumulated;
+  const instantRef = useRef({ wpm: 0, accuracy: 100 });
 
   const engine = useTypingEngine(generateChunk(topic, 60, 0));
+
+  // Live stats — computed from accumulated + current engine state each render
+  const elapsedMs = accumulated.startTime ? Date.now() - accumulated.startTime : 0;
+  const totalChars = accumulated.totalChars + engine.state.cursor;
+  const totalErrors = accumulated.totalErrors + engine.state.errors.length;
+  const currentSecond = Math.floor(elapsedMs / 1000);
+  const instantWpm = currentSecond > 0 ? Math.round((totalChars / 5) / (currentSecond / 60)) : 0;
+  const instantAccuracy = totalChars > 0
+    ? Math.round(((totalChars - totalErrors) / totalChars) * 100)
+    : 100;
+  instantRef.current = { wpm: instantWpm, accuracy: instantAccuracy };
 
   // Capture start time on first keypress
   useEffect(() => {
@@ -69,6 +83,12 @@ function EndlessSession({ topic, onEnd }: EndlessSessionProps) {
     engine.reset(generateChunk(topic, 60, nextIndex));
   }, [engine.state.isComplete]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Throttle live WPM/accuracy display to 1-second boundaries
+  useEffect(() => {
+    setLiveWpm(instantRef.current.wpm);
+    setLiveAccuracy(instantRef.current.accuracy);
+  }, [currentSecond]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleEnd = () => {
     const acc = accRef.current;
     const totalChars = acc.totalChars + engine.state.cursor;
@@ -86,17 +106,9 @@ function EndlessSession({ topic, onEnd }: EndlessSessionProps) {
     });
   };
 
-  // Live stats — computed from accumulated + current engine state each render
-  const elapsedMs = accumulated.startTime ? Date.now() - accumulated.startTime : 0;
   const mins = Math.floor(elapsedMs / 1000 / 60);
   const secs = Math.floor((elapsedMs / 1000) % 60);
   const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
-  const totalChars = accumulated.totalChars + engine.state.cursor;
-  const totalErrors = accumulated.totalErrors + engine.state.errors.length;
-  const liveWpm = elapsedMs > 0 ? Math.round((totalChars / 5) / (elapsedMs / 60000)) : 0;
-  const liveAccuracy = totalChars > 0
-    ? Math.round(((totalChars - totalErrors) / totalChars) * 100)
-    : 100;
 
   return (
     <div className={styles.session}>

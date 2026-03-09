@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react';
 import styles from './LiveStats.module.css';
 
 interface LiveStatsProps {
@@ -9,6 +10,17 @@ interface LiveStatsProps {
 }
 
 export function LiveStats({ wpm, accuracy, elapsedMs, errorCount, countdownMs }: LiveStatsProps) {
+  const currentSecond = Math.floor(elapsedMs / 1000);
+  const [displayWpm, setDisplayWpm] = useState(wpm);
+  const [displayAccuracy, setDisplayAccuracy] = useState(accuracy);
+  const latestRef = useRef({ wpm, accuracy });
+  latestRef.current = { wpm, accuracy };
+
+  useEffect(() => {
+    setDisplayWpm(latestRef.current.wpm);
+    setDisplayAccuracy(latestRef.current.accuracy);
+  }, [currentSecond]);
+
   const seconds = Math.floor(elapsedMs / 1000);
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
@@ -25,11 +37,11 @@ export function LiveStats({ wpm, accuracy, elapsedMs, errorCount, countdownMs }:
   return (
     <div className={styles.stats} aria-label="Live typing statistics">
       <div className={styles.stat}>
-        <span className={styles.value}>{wpm}</span>
+        <span className={styles.value}>{displayWpm}</span>
         <span className={styles.label}>WPM</span>
       </div>
       <div className={styles.stat}>
-        <span className={styles.value}>{accuracy}%</span>
+        <span className={styles.value}>{displayAccuracy}%</span>
         <span className={styles.label}>Accuracy</span>
       </div>
       <div className={styles.stat}>
