@@ -25,6 +25,7 @@ Non-obvious behaviors:
 Phase machine: `idle → listening → typing → done`
 
 - Same 50ms speech delay as useSpellingEngine
+- Accepts `mode` param: `'sequential'` (default, listen-then-type) or `'simultaneous'` (type while audio plays)
 - `replay()` increments `replayCount`, re-speaks; does not reset phase
 - Timer starts on `startTyping()`, stops on `submit()`
 - Score = `coverageScore` (content-word coverage), not typing accuracy

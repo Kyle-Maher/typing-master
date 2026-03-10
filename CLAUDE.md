@@ -28,7 +28,7 @@ Two React Contexts wrap the app (in `src/context/`):
 ### Core game logic (hooks)
 - **`useTypingEngine`** (`src/hooks/useTypingEngine.ts`) — stateful engine for the typing practice mode. Tracks cursor position, typed characters, correctness, errors, and problem keys. Timer starts on first keypress and stops on completion. Uses refs to keep `handleKey` stable across renders.
 - **`useSpellingEngine`** (`src/hooks/useSpellingEngine.ts`) — stateful engine for spelling practice. Uses the Web Speech API (`SpeechSynthesis`) to speak words aloud. Phases: `showing → typing → result → done`. Has a 5-second fallback timeout if speech doesn't fire `onend`. A `pronunciationMap` overrides TTS text for words the engine mispronounces (e.g. "the" → "thee"). Speech is delayed 50ms after `cancel()` to work around a Chrome bug where `speak()` silently fails if called synchronously after `cancel()`. On first mount, waits for `voiceschanged` before speaking since voices may not be loaded yet.
-- **`useDictationEngine`** (`src/hooks/useDictationEngine.ts`) — stateful engine for dictation mode. Phases: `idle → listening → typing → done`. Same 50ms speech delay as spelling. Score is `coverageScore` (fuzzy content-word coverage), not typing accuracy.
+- **`useDictationEngine`** (`src/hooks/useDictationEngine.ts`) — stateful engine for dictation mode. Phases: `idle → listening → typing → done`. Same 50ms speech delay as spelling. Supports `sequential` (listen-then-type) and `simultaneous` (type-while-listening) modes. Score is `coverageScore` (fuzzy content-word coverage), not typing accuracy.
 
 ### Data
 - **Lessons** (`src/data/lessons/`) — aggregated by `index.ts`. Categories: `home-row`, `common-words`, `sentences`, `paragraphs`, `custom`. Always import from `index.ts`, not sub-files directly. `adaptive.ts` is separate — not part of `getAllLessons`; generates targeted text from a profile's problem keys/words.
@@ -73,4 +73,4 @@ Timed mode (30/60/120s) is only available when no `lessonId` param; calls `force
 - `text.ts` — `normalizeText` (curly quotes → straight), `splitIntoLines` (word-wrap)
 
 ### Known pre-existing lint errors
-ESLint reports 9 errors in `Toast.tsx`, `TypingArea.tsx`, `SettingsContext.tsx`, `UserContext.tsx`, `useSound.ts`, `useTimer.ts`, and `useTypingEngine.ts` — mostly `react-hooks/refs` (ref updates during render) and `react-refresh/only-export-components`. These are pre-existing and unrelated to recent changes.
+ESLint reports ~20 pre-existing errors across `Toast.tsx`, `TypingArea.tsx`, `LiveStats.tsx`, `SettingsContext.tsx`, `UserContext.tsx`, `useSound.ts`, `useTimer.ts`, `useTypingEngine.ts`, `useSpellingEngine.ts`, and `useDictationEngine.ts` — mostly `react-hooks/refs` (ref updates during render) and `react-refresh/only-export-components`.

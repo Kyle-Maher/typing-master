@@ -27,9 +27,3 @@ Keys: `tm_profiles` | `tm_active_profile_id` | `tm_progress_{id}` | `tm_schema_v
 
 Read-only aggregations over `UserProgress` — no writes. Key fns:
 `getWpmOverTime`, `getTopProblemKeys`, `getTopProblemWords`, `getAverageWpm`, `getAverageAccuracy`, `getLessonsPerDay`, `getRecentBest`
-
-## dictationScoring.ts
-
-`assessDictation(original, typed)` → `DictationAssessment`
-- Coverage = % of **content words** (stop-words stripped) from original found in typed
-- Fuzzy match: Levenshtein distance ≤ `floor(wordLength / 4)`
