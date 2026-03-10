@@ -75,7 +75,10 @@ function speakPassage(
   };
 }
 
-export function useDictationEngine(passageText: string): DictationEngine {
+export function useDictationEngine(
+  passageText: string,
+  mode: 'sequential' | 'simultaneous' = 'sequential',
+): DictationEngine {
   const { settings } = useSettings();
   const voiceNameRef = useRef(settings.voiceName);
   voiceNameRef.current = settings.voiceName;
@@ -135,8 +138,12 @@ export function useDictationEngine(passageText: string): DictationEngine {
   }, [state.phase, state.replayCount, passageText]);
 
   const startListening = useCallback(() => {
-    setState((prev) => (prev.phase === 'idle' ? { ...prev, phase: 'listening' } : prev));
-  }, []);
+    if (mode === 'simultaneous') {
+      setState((prev) => (prev.phase === 'idle' ? { ...prev, phase: 'typing', replayCount: 1 } : prev));
+    } else {
+      setState((prev) => (prev.phase === 'idle' ? { ...prev, phase: 'listening' } : prev));
+    }
+  }, [mode]);
 
   const setInput = useCallback((value: string) => {
     setState((prev) => ({ ...prev, input: value }));

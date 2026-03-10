@@ -57,6 +57,7 @@ export interface DictationResult {
   typedText: string;
   points: number;
   completedAt: string;
+  mode?: 'sequential' | 'simultaneous';
 }
 
 export interface CustomWordList {
