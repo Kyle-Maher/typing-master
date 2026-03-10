@@ -34,6 +34,17 @@ const SPEECH_FALLBACK_TIMEOUT = 5000;
 /** Words whose spelling‑out pronunciation differs from normal reading. */
 const pronunciationMap: Record<string, string> = {
   the: 'thee',
+  gnaw: 'naw',
+  mnemonic: 'neh-mon-ik',
+  pneumonia: 'new-moan-ya',
+  psalm: 'sahm',
+  rendezvous: 'ron-day-voo',
+  debris: 'deh-bree',
+  bourgeoisie: 'boor-zhwah-zee',
+  heuristic: 'hyoo-ris-tik',
+  segue: 'seg-way',
+  synecdoche: 'sih-nek-duh-kee',
+  "hors d'oeuvre": 'or-derv',
 };
 
 /**
