@@ -54,6 +54,15 @@
   box-shadow: var(--shadow-md);
 }
 
+.personalCard {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light, color-mix(in srgb, var(--color-primary) 10%, transparent));
+}
+
+.personalCard h3 {
+  color: var(--color-primary);
+}
+
 .summaryGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

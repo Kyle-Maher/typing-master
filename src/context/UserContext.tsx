@@ -3,6 +3,7 @@ import type { UserProfile, UserProgress, LessonResult, SpellingResult, Dictation
 import * as storage from '@/services/storage';
 import { updateStreak } from '@/utils/streak';
 import { getLessonById } from '@/data/lessons';
+import { extractMissedWords } from '@/utils/missedWords';
 
 interface UserContextValue {
   profile: UserProfile | null;
@@ -15,6 +16,7 @@ interface UserContextValue {
   addLessonResult: (result: LessonResult) => void;
   addSpellingResult: (result: SpellingResult) => void;
   addDictationResult: (result: DictationResult) => void;
+  addWordsToSpellingList: (words: string[]) => void;
   clearHistory: () => void;
 }
 
@@ -82,20 +84,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
       // Extract problem words from error positions
       const lesson = getLessonById(result.lessonId, progress.customWordLists);
       if (lesson && result.errors.length > 0) {
-        const text = lesson.text;
+        const missed = extractMissedWords(lesson.text, result.errors);
         const newProblemWords = { ...progress.problemWords };
-        const errorPositions = new Set(result.errors.map((e) => e.position));
-        // Find which word each error position falls in
-        let charIdx = 0;
-        for (const word of text.split(/\s+/)) {
-          const wordEnd = charIdx + word.length;
-          for (let i = charIdx; i < wordEnd; i++) {
-            if (errorPositions.has(i)) {
-              newProblemWords[word.toLowerCase()] = (newProblemWords[word.toLowerCase()] ?? 0) + 1;
-              break; // count each word at most once per error pass
-            }
-          }
-          charIdx = wordEnd + 1; // +1 for the space
+        for (const word of missed) {
+          newProblemWords[word] = (newProblemWords[word] ?? 0) + 1;
         }
         updated.problemWords = newProblemWords;
       }
@@ -162,6 +154,28 @@ export function UserProvider({ children }: { children: ReactNode }) {
     [progress, handleUpdateProgress],
   );
 
+  const handleAddWordsToSpellingList = useCallback(
+    (words: string[]) => {
+      if (!progress) return;
+      const lists = [...(progress.customWordLists ?? [])];
+      const idx = lists.findIndex((l) => l.id === 'personal-spelling');
+      if (idx >= 0) {
+        const existing = new Set(lists[idx]!.words);
+        const merged = [...lists[idx]!.words, ...words.filter((w) => !existing.has(w))];
+        lists[idx] = { ...lists[idx]!, words: merged };
+      } else {
+        lists.unshift({
+          id: 'personal-spelling',
+          name: 'My Spelling Words',
+          words: [...new Set(words)],
+          createdAt: new Date().toISOString(),
+        });
+      }
+      handleUpdateProgress({ ...progress, customWordLists: lists });
+    },
+    [progress, handleUpdateProgress],
+  );
+
   const handleClearHistory = useCallback(() => {
     if (!progress) return;
     handleUpdateProgress({
@@ -193,6 +207,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         addLessonResult: handleAddLessonResult,
         addSpellingResult: handleAddSpellingResult,
         addDictationResult: handleAddDictationResult,
+        addWordsToSpellingList: handleAddWordsToSpellingList,
         clearHistory: handleClearHistory,
       }}
     >

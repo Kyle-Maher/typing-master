@@ -1,17 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSpellingEngine } from '@/hooks/useSpellingEngine';
-import { getAllSpellingLessons, getSpellingLessonById } from '@/data/spelling/index';
+import { getAllSpellingLessons } from '@/data/spelling/index';
 import { WordPrompt } from '@/components/spelling/WordPrompt';
 import { SpellingArea } from '@/components/spelling/SpellingArea';
 import { Button } from '@/components/common/Button';
 import { useUser } from '@/context/UserContext';
 import type { SpellingResult } from '@/types/user';
+import type { SpellingLesson } from '@/types/spelling';
 import styles from './SpellingPracticePage.module.css';
 
 export function SpellingPracticePage() {
-  const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
+  const [selectedLesson, setSelectedLesson] = useState<SpellingLesson | null>(null);
+  const { progress } = useUser();
   const spellingLessons = getAllSpellingLessons();
-  const selectedLesson = selectedLessonId ? getSpellingLessonById(selectedLessonId) : undefined;
+
+  const personalList = progress?.customWordLists.find((l) => l.id === 'personal-spelling');
 
   if (!selectedLesson) {
     return (
@@ -19,11 +22,27 @@ export function SpellingPracticePage() {
         <h1 className={styles.title}>Spelling Practice</h1>
         <p className={styles.subtitle}>Choose a word list to practice spelling.</p>
         <div className={styles.lessonGrid}>
+          {personalList && personalList.words.length > 0 && (
+            <button
+              className={`${styles.lessonCard} ${styles.personalCard}`}
+              onClick={() =>
+                setSelectedLesson({
+                  id: 'personal-spelling',
+                  title: 'My Spelling Words',
+                  gradeLevel: 'Personal',
+                  words: personalList.words.map((w) => ({ word: w, difficulty: 1 })),
+                })
+              }
+            >
+              <h3>My Spelling Words</h3>
+              <p>{personalList.words.length} words</p>
+            </button>
+          )}
           {spellingLessons.map((lesson) => (
             <button
               key={lesson.id}
               className={styles.lessonCard}
-              onClick={() => setSelectedLessonId(lesson.id)}
+              onClick={() => setSelectedLesson(lesson)}
             >
               <h3>{lesson.title}</h3>
               <p>{lesson.words.length} words</p>
@@ -36,15 +55,15 @@ export function SpellingPracticePage() {
 
   return (
     <SpellingSession
-      key={selectedLessonId}
-      lessonId={selectedLessonId!}
+      key={selectedLesson.id}
+      lessonId={selectedLesson.id}
       lesson={selectedLesson}
-      onBack={() => setSelectedLessonId(null)}
+      onBack={() => setSelectedLesson(null)}
     />
   );
 }
 
-function SpellingSession({ lessonId, lesson, onBack }: { lessonId: string; lesson: NonNullable<ReturnType<typeof getSpellingLessonById>>; onBack: () => void }) {
+function SpellingSession({ lessonId, lesson, onBack }: { lessonId: string; lesson: SpellingLesson; onBack: () => void }) {
   const engine = useSpellingEngine(lesson.words);
   const { profile, addSpellingResult } = useUser();
   const savedRef = useRef(false);

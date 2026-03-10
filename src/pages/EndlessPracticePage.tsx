@@ -5,6 +5,8 @@ import { TypingArea } from '@/components/typing/TypingArea';
 import { Button } from '@/components/common/Button';
 import { TOPICS, generateChunk } from '@/data/endless';
 import type { TopicId } from '@/data/endless';
+import { extractMissedWords } from '@/utils/missedWords';
+import { useUser } from '@/context/UserContext';
 import styles from './EndlessPracticePage.module.css';
 
 interface SessionResult {
@@ -13,6 +15,7 @@ interface SessionResult {
   wordsTyped: number;
   elapsedSeconds: number;
   chunksCompleted: number;
+  missedWords: string[];
 }
 
 interface AccumulatedStats {
@@ -21,6 +24,7 @@ interface AccumulatedStats {
   startTime: number | null;
   chunksCompleted: number;
   chunkIndex: number;
+  missedWords: string[];
 }
 
 // ── EndlessSession ────────────────────────────────────────────────────────────
@@ -37,6 +41,7 @@ function EndlessSession({ topic, onEnd }: EndlessSessionProps) {
     startTime: null,
     chunksCompleted: 0,
     chunkIndex: 0,
+    missedWords: [],
   });
   const [liveWpm, setLiveWpm] = useState(0);
   const [liveAccuracy, setLiveAccuracy] = useState(100);
@@ -72,13 +77,17 @@ function EndlessSession({ topic, onEnd }: EndlessSessionProps) {
     if (!engine.state.isComplete) return;
     const cursor = engine.state.cursor;
     const errorsLen = engine.state.errors.length;
-    const nextIndex = accRef.current.chunkIndex + 1;
+    const currentChunkIndex = accRef.current.chunkIndex;
+    const nextIndex = currentChunkIndex + 1;
+    const completedText = generateChunk(topic, 60, currentChunkIndex);
+    const newWords = extractMissedWords(completedText, engine.state.errors);
     setAccumulated(prev => ({
       ...prev,
       totalChars: prev.totalChars + cursor,
       totalErrors: prev.totalErrors + errorsLen,
       chunksCompleted: prev.chunksCompleted + 1,
       chunkIndex: nextIndex,
+      missedWords: [...new Set([...prev.missedWords, ...newWords])],
     }));
     engine.reset(generateChunk(topic, 60, nextIndex));
   }, [engine.state.isComplete]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -95,6 +104,9 @@ function EndlessSession({ topic, onEnd }: EndlessSessionProps) {
     const totalErrors = acc.totalErrors + engine.state.errors.length;
     const elapsedMs = acc.startTime ? Date.now() - acc.startTime : 0;
     const mins = elapsedMs / 60000;
+    const currentText = generateChunk(topic, 60, acc.chunkIndex);
+    const currentWords = extractMissedWords(currentText, engine.state.errors);
+    const allMissedWords = [...new Set([...acc.missedWords, ...currentWords])];
     onEnd({
       wpm: mins > 0 ? Math.round((totalChars / 5) / mins) : 0,
       accuracy: totalChars > 0
@@ -103,6 +115,7 @@ function EndlessSession({ topic, onEnd }: EndlessSessionProps) {
       wordsTyped: Math.round(totalChars / 5),
       elapsedSeconds: Math.round(elapsedMs / 1000),
       chunksCompleted: acc.chunksCompleted,
+      missedWords: allMissedWords,
     });
   };
 
@@ -149,6 +162,9 @@ interface SummaryScreenProps {
 
 function SummaryScreen({ result, onTryAgain }: SummaryScreenProps) {
   const navigate = useNavigate();
+  const { addWordsToSpellingList } = useUser();
+  const [selectedWords, setSelectedWords] = useState<Set<string>>(new Set());
+  const [committed, setCommitted] = useState(false);
   const mins = Math.floor(result.elapsedSeconds / 60);
   const secs = result.elapsedSeconds % 60;
   const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
@@ -181,6 +197,56 @@ function SummaryScreen({ result, onTryAgain }: SummaryScreenProps) {
           <span className={styles.summaryCardLabel}>Chunks</span>
         </div>
       </div>
+      {result.missedWords.length > 0 && (
+        <div className={styles.missedWords}>
+          <h3 className={styles.missedWordsTitle}>Missed Words</h3>
+          <p className={styles.missedWordsHint}>Select words to add to your spelling list.</p>
+          <div className={styles.wordPills}>
+            {result.missedWords.map((word) => (
+              <button
+                key={word}
+                className={`${styles.wordPill} ${selectedWords.has(word) ? styles.wordPillSelected : ''}`}
+                onClick={() => {
+                  if (committed) return;
+                  setSelectedWords((prev) => {
+                    const next = new Set(prev);
+                    next.has(word) ? next.delete(word) : next.add(word);
+                    return next;
+                  });
+                }}
+              >
+                {word}
+              </button>
+            ))}
+          </div>
+          <div className={styles.missedWordsActions}>
+            <button
+              className={styles.selectAllBtn}
+              onClick={() => {
+                if (committed) return;
+                if (selectedWords.size === result.missedWords.length) {
+                  setSelectedWords(new Set());
+                } else {
+                  setSelectedWords(new Set(result.missedWords));
+                }
+              }}
+              disabled={committed}
+            >
+              {selectedWords.size === result.missedWords.length ? 'Deselect All' : 'Select All'}
+            </button>
+            <button
+              className={styles.addAllBtn}
+              disabled={selectedWords.size === 0 || committed}
+              onClick={() => {
+                addWordsToSpellingList([...selectedWords]);
+                setCommitted(true);
+              }}
+            >
+              {committed ? 'Added!' : `Add to Spelling List${selectedWords.size > 0 ? ` (${selectedWords.size})` : ''}`}
+            </button>
+          </div>
+        </div>
+      )}
       <div className={styles.summaryActions}>
         <Button variant="secondary" onClick={onTryAgain}>Try Again</Button>
         <Button onClick={() => navigate('/')}>Home</Button>

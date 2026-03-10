@@ -1,14 +1,17 @@
-import { useEffect, useCallback, useMemo } from 'react';
+import { useEffect, useCallback, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '@/context/UserContext';
 import { Button } from '@/components/common/Button';
 import { getLessonById, getLessonsByCategory } from '@/data/lessons';
+import { extractMissedWords } from '@/utils/missedWords';
 import styles from './ResultsPage.module.css';
 
 export function ResultsPage() {
   const { lessonId } = useParams();
   const navigate = useNavigate();
-  const { progress } = useUser();
+  const { progress, addWordsToSpellingList } = useUser();
+  const [selectedWords, setSelectedWords] = useState<Set<string>>(new Set());
+  const [committed, setCommitted] = useState(false);
 
   const lastResult = useMemo(() => {
     if (!progress || progress.lessonHistory.length === 0) return undefined;
@@ -26,6 +29,13 @@ export function ResultsPage() {
 
   const bestResult = progress?.bestResults[lastResult?.lessonId ?? ''];
   const isNewBest = lastResult != null && bestResult != null && lastResult.id === bestResult.id;
+
+  const missedWords = useMemo(() => {
+    if (!lastResult || lastResult.errors.length === 0) return [];
+    const lesson = getLessonById(lastResult.lessonId, progress?.customWordLists);
+    if (!lesson) return [];
+    return extractMissedWords(lesson.text, lastResult.errors);
+  }, [lastResult, progress?.customWordLists]);
 
   const goToNextLesson = useCallback(() => {
     if (!lastResult) return;
@@ -112,6 +122,57 @@ export function ResultsPage() {
                   {key === ' ' ? 'Space' : key} ({count})
                 </span>
               ))}
+          </div>
+        </div>
+      )}
+
+      {missedWords.length > 0 && (
+        <div className={styles.missedWords}>
+          <h3 className={styles.missedWordsTitle}>Missed Words</h3>
+          <p className={styles.missedWordsHint}>Select words to add to your spelling list.</p>
+          <div className={styles.wordPills}>
+            {missedWords.map((word) => (
+              <button
+                key={word}
+                className={`${styles.wordPill} ${selectedWords.has(word) ? styles.wordPillSelected : ''}`}
+                onClick={() => {
+                  if (committed) return;
+                  setSelectedWords((prev) => {
+                    const next = new Set(prev);
+                    next.has(word) ? next.delete(word) : next.add(word);
+                    return next;
+                  });
+                }}
+              >
+                {word}
+              </button>
+            ))}
+          </div>
+          <div className={styles.missedWordsActions}>
+            <button
+              className={styles.selectAllBtn}
+              onClick={() => {
+                if (committed) return;
+                if (selectedWords.size === missedWords.length) {
+                  setSelectedWords(new Set());
+                } else {
+                  setSelectedWords(new Set(missedWords));
+                }
+              }}
+              disabled={committed}
+            >
+              {selectedWords.size === missedWords.length ? 'Deselect All' : 'Select All'}
+            </button>
+            <button
+              className={styles.addAllBtn}
+              disabled={selectedWords.size === 0 || committed}
+              onClick={() => {
+                addWordsToSpellingList([...selectedWords]);
+                setCommitted(true);
+              }}
+            >
+              {committed ? 'Added!' : `Add to Spelling List${selectedWords.size > 0 ? ` (${selectedWords.size})` : ''}`}
+            </button>
           </div>
         </div>
       )}
