@@ -1,0 +1,219 @@
+.page {
+  padding: var(--space-2xl) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xl);
+  animation: fadeIn 0.5s ease;
+}
+
+.stars {
+  font-size: var(--text-4xl);
+  color: var(--color-warning);
+  animation: popIn 0.6s ease;
+}
+
+.title {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  width: 100%;
+  max-width: 500px;
+}
+
+.statCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  animation: countUp 0.4s ease both;
+}
+
+.statCard:nth-child(2) { animation-delay: 0.1s; }
+.statCard:nth-child(3) { animation-delay: 0.2s; }
+.statCard:nth-child(4) { animation-delay: 0.3s; }
+.statCard:nth-child(5) { animation-delay: 0.4s; }
+.statCard:nth-child(6) { animation-delay: 0.5s; }
+
+.statValue {
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.statLabel {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+}
+
+.problemKeys {
+  text-align: center;
+}
+
+.problemKeys h3 {
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-sm);
+}
+
+.keyList {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.problemKey {
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--color-error-light);
+  color: var(--color-error);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.newBest {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  font-size: var(--text-lg);
+  animation: popIn 0.6s ease;
+}
+
+.prevBest {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.missedWords {
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.missedWordsTitle {
+  font-size: var(--text-lg);
+}
+
+.missedWordsHint {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.wordPills {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.wordPill {
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition-fast);
+}
+
+.wordPill:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.wordPillSelected {
+  background: var(--color-error-light);
+  color: var(--color-error);
+  border-color: var(--color-error);
+}
+
+.missedWordsActions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+  margin-top: var(--space-xs);
+}
+
+.selectAllBtn {
+  padding: var(--space-xs) var(--space-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition-fast);
+}
+
+.selectAllBtn:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.selectAllBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.addAllBtn {
+  padding: var(--space-xs) var(--space-md);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity var(--transition-fast);
+}
+
+.addAllBtn:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.addAllBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-md);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.5); }
+  70% { transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
