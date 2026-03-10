@@ -5,7 +5,7 @@
 - `lesson.ts` — `Lesson`, `LessonCategory`, `DifficultyLevel`
 - `scoring.ts` — `ScoringConfig` (internal to `services/scoring.ts` only)
 - `spelling.ts` — `SpellingWord`, `SpellingLesson`
-- `dictation.ts` — `DictationPassage`, `DictationResult`, `DictationAssessment`
+- `dictation.ts` — `DictationPassage`, `DictationResult` (includes optional `mode` field), `DictationAssessment`
 
 ## Critical distinction in UserProgress
 

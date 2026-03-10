@@ -13,6 +13,7 @@ Two providers — nest SettingsProvider **inside** UserProvider (SettingsContext
   - `problemKeys` map merged (counts accumulated across runs)
   - `problemWords` extracted by walking char-index ranges per word in lesson text
   - streak updated via `utils/streak.ts`
+- `addWordsToSpellingList(words)` — upserts a `'personal-spelling'` custom word list (`'My Spelling Words'`), deduplicating before merge
 - No delete function — callers filter the profiles array and re-save
 
 ## SettingsContext

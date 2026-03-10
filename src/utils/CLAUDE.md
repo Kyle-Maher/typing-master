@@ -8,6 +8,7 @@
 | `wpm.ts` | `calculateWpm`, `calculateNetWpm` | See formulas below |
 | `streak.ts` | `updateStreak(current, longest, lastDate)` | See logic below |
 | `text.ts` | `normalizeText`, `splitIntoLines` | Curly quotes → straight; word-wrap helper |
+| `missedWords.ts` | `extractMissedWords(text, errors)` | Returns deduplicated words containing error positions |
 
 ## WPM formulas
 - Gross WPM = `(charsTyped / 5) / minutes` (standard 5-char word unit)
