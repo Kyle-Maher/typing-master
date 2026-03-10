@@ -203,3 +203,72 @@
   gap: var(--space-md);
   justify-content: center;
 }
+
+/* Mode selector */
+
+.modeSelector {
+  display: flex;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  width: fit-content;
+}
+
+.modeBtn {
+  padding: var(--space-sm) var(--space-lg);
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.modeBtn:hover {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.modeBtnActive {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.modeBtnActive:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* Passage score chips */
+
+.passageScores {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+}
+
+.scoreChip {
+  font-size: var(--text-xs);
+  color: var(--color-primary);
+}
+
+.scoreChipMuted {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  opacity: 0.6;
+}
+
+/* Mode badge in session header */
+
+.modeBadge {
+  margin-left: auto;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full, 9999px);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}

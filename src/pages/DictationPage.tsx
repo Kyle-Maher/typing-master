@@ -9,9 +9,27 @@ import styles from './DictationPage.module.css';
 
 const DIFFICULTIES = ['beginner', 'intermediate', 'advanced'] as const;
 
+function getBestScores(history: DictationResult[], passageId: string) {
+  const records = history.filter((r) => r.passageId === passageId);
+  const seqBest = records
+    .filter((r) => (r.mode ?? 'sequential') === 'sequential')
+    .reduce<number | null>(
+      (best, r) => (best === null || r.coverageScore > best ? r.coverageScore : best),
+      null,
+    );
+  const simBest = records
+    .filter((r) => r.mode === 'simultaneous')
+    .reduce<number | null>(
+      (best, r) => (best === null || r.coverageScore > best ? r.coverageScore : best),
+      null,
+    );
+  return { sequential: seqBest, simultaneous: simBest };
+}
+
 export function DictationPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const passages = getAllDictationPassages();
+  const { progress } = useUser();
   const selected = selectedId ? getDictationPassageById(selectedId) : undefined;
 
   if (!selected) {
@@ -19,22 +37,34 @@ export function DictationPage() {
       <div className={styles.page}>
         <h1 className={styles.title}>Dictation Practice</h1>
         <p className={styles.subtitle}>Listen to a passage, then type what you heard.</p>
+
         {DIFFICULTIES.map((diff) => {
           const group = passages.filter((p) => p.difficulty === diff);
           return (
             <section key={diff} className={styles.group}>
               <h2 className={styles.groupTitle}>{diff.charAt(0).toUpperCase() + diff.slice(1)}</h2>
               <div className={styles.passageGrid}>
-                {group.map((p) => (
-                  <button
-                    key={p.id}
-                    className={styles.passageCard}
-                    onClick={() => setSelectedId(p.id)}
-                  >
-                    <h3>{p.title}</h3>
-                    <p>{p.text.split(' ').length} words</p>
-                  </button>
-                ))}
+                {group.map((p) => {
+                  const scores = getBestScores(progress?.dictationHistory ?? [], p.id);
+                  return (
+                    <button
+                      key={p.id}
+                      className={styles.passageCard}
+                      onClick={() => setSelectedId(p.id)}
+                    >
+                      <h3>{p.title}</h3>
+                      <p>{p.text.split(' ').length} words</p>
+                      <div className={styles.passageScores}>
+                        <span className={scores.sequential !== null ? styles.scoreChip : styles.scoreChipMuted}>
+                          Listen First: {scores.sequential !== null ? `${scores.sequential}%` : '—'}
+                        </span>
+                        <span className={scores.simultaneous !== null ? styles.scoreChip : styles.scoreChipMuted}>
+                          Type Along: {scores.simultaneous !== null ? `${scores.simultaneous}%` : '—'}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </section>
           );
@@ -52,8 +82,15 @@ export function DictationPage() {
   );
 }
 
-function DictationSession({ passage, onBack }: { passage: DictationPassage; onBack: () => void }) {
-  const engine = useDictationEngine(passage.text);
+function DictationSession({
+  passage,
+  onBack,
+}: {
+  passage: DictationPassage;
+  onBack: () => void;
+}) {
+  const [mode, setMode] = useState<'sequential' | 'simultaneous'>('sequential');
+  const engine = useDictationEngine(passage.text, mode);
   const { profile, addDictationResult } = useUser();
   const savedRef = useRef(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -71,10 +108,11 @@ function DictationSession({ passage, onBack }: { passage: DictationPassage; onBa
         typedText: engine.state.input,
         points,
         completedAt: new Date().toISOString(),
+        mode,
       };
       addDictationResult(result);
     }
-  }, [engine.state.phase, engine.state.coverageScore, engine.state.input, profile, passage, addDictationResult]);
+  }, [engine.state.phase, engine.state.coverageScore, engine.state.input, profile, passage, addDictationResult, mode]);
 
   // Focus textarea when typing phase starts
   useEffect(() => {
@@ -128,12 +166,35 @@ function DictationSession({ passage, onBack }: { passage: DictationPassage; onBa
       <div className={styles.header}>
         <Button variant="ghost" size="sm" onClick={onBack}>&larr; Back</Button>
         <h1 className={styles.title}>{passage.title}</h1>
+        <span className={styles.modeBadge}>
+          {mode === 'sequential' ? 'Listen First' : 'Type Along'}
+        </span>
       </div>
 
       {phase === 'idle' && (
         <div className={styles.idleState}>
-          <p className={styles.instruction}>Press listen to hear the passage, then type what you heard.</p>
-          <Button onClick={engine.startListening}>Listen to Passage</Button>
+          <div className={styles.modeSelector}>
+            <button
+              className={`${styles.modeBtn} ${mode === 'sequential' ? styles.modeBtnActive : ''}`}
+              onClick={() => setMode('sequential')}
+            >
+              Listen First
+            </button>
+            <button
+              className={`${styles.modeBtn} ${mode === 'simultaneous' ? styles.modeBtnActive : ''}`}
+              onClick={() => setMode('simultaneous')}
+            >
+              Type Along
+            </button>
+          </div>
+          <p className={styles.instruction}>
+            {mode === 'simultaneous'
+              ? 'Press start to hear the passage while you type along.'
+              : 'Press listen to hear the passage, then type what you heard.'}
+          </p>
+          <Button onClick={engine.startListening}>
+            {mode === 'simultaneous' ? 'Start' : 'Listen to Passage'}
+          </Button>
         </div>
       )}
 
@@ -150,7 +211,11 @@ function DictationSession({ passage, onBack }: { passage: DictationPassage; onBa
 
       {phase === 'typing' && (
         <div className={styles.typingState}>
-          <p className={styles.instruction}>Type what you heard. Don&apos;t worry about perfection.</p>
+          <p className={styles.instruction}>
+            {mode === 'simultaneous'
+              ? 'Listen and type along. Replay anytime.'
+              : 'Type what you heard. Don\u2019t worry about perfection.'}
+          </p>
           <textarea
             ref={textareaRef}
             className={styles.textarea}
