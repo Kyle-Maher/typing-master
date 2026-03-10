@@ -32,7 +32,7 @@ Two React Contexts wrap the app (in `src/context/`):
 
 ### Data
 - **Lessons** (`src/data/lessons/`) — aggregated by `index.ts`. Categories: `home-row`, `common-words`, `sentences`, `paragraphs`, `custom`. Always import from `index.ts`, not sub-files directly. `adaptive.ts` is separate — not part of `getAllLessons`; generates targeted text from a profile's problem keys/words.
-- **Spelling** (`src/data/spelling/`) — grade-1, grade-3, and advanced word lists.
+- **Spelling** (`src/data/spelling/`) — 20 lessons (grades 1–5, themed, academic/SAT/business, advanced, expert). Aggregated by `index.ts`. Each lesson has ~20 words with hints and sentences for TTS-based practice.
 - **Dictation** (`src/data/dictation/`) — beginner/intermediate/advanced passages.
 - **Endless** (`src/data/endless/`) — topic sets (food, locations, poems, random, stories) with an aggregator index.
 - `keyboard-layouts.ts` — key-to-finger mappings used by `components/keyboard/`.
